@@ -1,0 +1,16 @@
+{
+    "name": "vinosa/repo",
+    "description": " Repository abstraction.",
+    "authors": [
+        {
+            "name": "vinosa",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Vinosa\\Repo\\":        "src"
+        }
+    }
+}
