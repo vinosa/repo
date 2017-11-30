@@ -87,27 +87,6 @@ class AbstractGenericEntity
         return $query ;
     }
     
-    protected function querySolr(SolrQueryBuilder $query)
-    {
-            
-        return $query->select( 
-            array(
-                ISolrField::TITRE,
-                ISolrField::NAKED_TEXTE,
-                ISolrField::TEXTE,
-                ISolrField::NAKED_TITRE,
-                ISolrField::TYPE,
-                ISolrField::SITE_NAME,
-                ISolrField::PLATFORMID,
-                ISolrField::LANGUE,
-                ISolrField::ENTITY_IDENTITY,
-                ISolrField::SITEID,
-                ISolrField::ANCESTRY,
-                ISolrField::ID
-                  )
-            ) ;
-        
-    }
     
     public function query(QueryBuilderInterface $query)
     {
