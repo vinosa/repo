@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2017 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,11 @@
 namespace Vinosa\Repo\Adapters;
 
 /**
+ * Description of Test
  *
- * @author vinosa
+ * @author vinogradov
  */
-interface AdapterInterface
+class Test
 {
-    public function createEntity($class, $result) ;
-    
-    public function createEntities($class, $result) ;
-    
-    public function quote($str) ;
-    
-    public function query($str) ;
+    //put your code here
 }
