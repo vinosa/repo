@@ -10,10 +10,10 @@ use Vinosa\Repo\Tools\Logger ;
 
 require 'vendor/autoload.php';
 
-$config = ["host" => "",
-           "user" => "",
-           "password" => "",
-           "database" => ""
+$config = ["host" =>  "",
+           "user" =>  "",
+           "password" =>  "",
+           "database" =>  ""
            ];
 
 $configuration = new PdoConfiguration($config) ;
