@@ -30,11 +30,11 @@ use Vinosa\Repo\Exceptions\QueryBuilderException ;
  */
 class SqlQueryBuilder extends AbstractQueryBuilder
 {
-    public $insert = array();
-    public $update = array();
+     
+    public $insert = [];
+    public $update = [];
     protected $join = "" ;
-    protected $insertTo ;
-    protected $from = array() ;
+    protected $tables = [] ;
     
     
     public function __construct(DbRepository $repository)
@@ -45,15 +45,33 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     
      public function from(DbTable $table)
     {
+                    
+        if( !in_array( $this->checkDatabaseName( $table ), $this->tables ) ){
+            
+            $this->tables[] = $table ;
+            
+        }
         
-        $this->from[] = (string) $this->checkDatabaseName( $table ) ;
+        return $this ;
+    }
+    
+    public function flushTables()
+    {
+        $this->tables = [];
         
         return $this ;
     }
     
     public function join(DbTable $table)
     {
-        $this->join .= " JOIN " . (string) $this->checkDatabaseName( $table ) ;
+        $this->join .= " JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
+        
+        return $this ;
+    }
+    
+    public function leftOuterJoin(DbTable $table)
+    {
+        $this->join .= " LEFT OUTER JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
         
         return $this ;
     }
@@ -65,12 +83,6 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $this ;
     }
     
-    public function insertTo(DbTable $table)
-    {
-        $this->insertTo = $this->checkDatabaseName($table) ;
-        
-        return $this ;
-    }
     
     public function subquery()
     {
@@ -107,7 +119,7 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     public function getQueryInsert()
     {
              
-        return "INSERT INTO " . $this->getTable() .  
+        return "INSERT INTO " . $this->getTableStr() .  
             
                 " (" . implode(", " , array_keys( $this->insert) ) . ") " .
             
@@ -119,7 +131,7 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     public function getQueryUpdate()
     {
           
-        $q = "UPDATE " . $this->getTable() . " SET ";
+        $q = "UPDATE " . $this->getTableStr() . " SET ";
            
         $q .= implode(", ", $this->update) ;
         
@@ -130,7 +142,7 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     
     public function getQueryDelete()
     {
-        $q = "DELETE FROM " . $this->getTable() ;  
+        $q = "DELETE FROM " . $this->getTableStr() ;  
         
         $q .= " WHERE " . $this->whereClause->output() ;
         
@@ -152,13 +164,24 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $q ;
     }
     
+    public function updateField($field, $value)
+    {
+        $this->repository->updateField($this, $field, $value );
+    }
+    
     private function getFrom()
     {
+        $from = [] ;
         
-        $str = implode(", " , $this->from ) ;
+        foreach($this->getTables() as $table){
+            
+            $from[] = (string) $table . $table->getAliasString() ;
+        }
+        
+        $str = implode(", " , $from ) ;
         
         $str .= $this->join ;
-        
+                
         return $str ;
         
     }
@@ -174,9 +197,9 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $table ;
     }
     
-    private function getSelect()
+    protected function getSelect()
     {
-        $str = "*" ;
+        $str = $this->getTableStr() . ".*" ;
         
         if( count( $this->getFields() ) > 0 ){
             
@@ -187,14 +210,28 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $str ;
     }
     
-    private function getTable()
+    protected function getTable()
     {
-        if(empty($this->insertTo)){
+       
+        if( count($this->tables) == 0 ){
             
-            throw new QueryBuilderException( "Empty Table Name" );
+            throw new QueryBuilderException( "Empty Table " . print_r($this,true) );
             
         }
         
-        return (string) $this->insertTo ;
+        return $this->tables[0] ;
     }
+    
+    protected function getTableStr()
+    {
+        
+        return (string) $this->checkDatabaseName( $this->getTable() ) ;
+        
+    }
+    
+    protected function getTables()
+    {
+        return $this->tables ;
+    }
+        
 }

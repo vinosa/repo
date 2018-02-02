@@ -28,7 +28,8 @@ use Vinosa\Repo\Exceptions\QueryBuilderException ;
  */
 class WhereClause
 {
-    private $wheres = array();
+
+    private $wheres = [];
     private $builder ;
       
     public function __construct(QueryBuilderInterface $builder )
@@ -139,6 +140,21 @@ class WhereClause
         
     }
     
+    public function whereNull( $col )
+    {
+        if( $this->isSql() ){
+            
+            $value = " NULL " ;
+            
+            $operator = " IS " ;
+            
+        } 
+        // todo solr  
+        
+        return $this->whereSafe($col, $value, $operator) ; 
+        
+    }
+    
     public function andWhere($col, $val = null, $operator = false)
     {
         
@@ -165,6 +181,41 @@ class WhereClause
         
         return $this->whereSafe($col, $val, $operator, "OR");
         
+    }
+    
+    public function whereNot($col, $val)
+    {
+        if( $this->isSolr() ){
+            
+            return $this->where("!" . $col, $val, ":", "AND");
+            
+        }
+        
+        if( $this->isSql() ){
+            
+            return $this->where($col, $val, "<>", "AND");
+        }
+            
+    }
+    
+    public function whereIn($col, $unsafeValues = [])
+    {
+        $safeValues = array_map( array( $this, "quote" ), $unsafeValues );
+               
+        if( $this->isSolr() ){
+            
+            $safeString = "(". implode( " OR ", $safeValues ) . ")" ; 
+        
+            return $this->whereSafe( $col, $safeString ) ;
+        
+        }
+        
+        if( $this->isSql() ){
+                       
+            $safeString = "(". implode( ",", $safeValues ) . ")" ; 
+            
+            return $this->whereSafe( $col, $safeString, " IN " ) ;
+        }
     }
        
     private function operator($operator)
@@ -216,4 +267,6 @@ class WhereClause
             
         }
     }
+    
+           
 }

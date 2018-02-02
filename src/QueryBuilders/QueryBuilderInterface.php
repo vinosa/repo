@@ -26,7 +26,7 @@ namespace Vinosa\Repo\QueryBuilders ;
  */
 interface QueryBuilderInterface
 {
-   public function start($start) ;
+    public function start($start) ;
     
     public function limit($limit) ;
     

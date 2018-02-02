@@ -26,9 +26,17 @@ namespace Vinosa\Repo\Schema ;
  */
 class DbTable
 {
+    //put your code here
     protected $databaseName ;
     protected $name ;
     protected $alias ;
+    
+    protected $fields = array() ;
+    protected $readonly = array() ;
+    protected $primary = array() ;  
+    protected $relational = array();
+    protected $unique = [] ;
+    protected $unescaped = [] ;
     
     public function __construct($name, $databaseName = null, $alias = null)
     {
@@ -36,6 +44,7 @@ class DbTable
         $this->name = $name ;
         $this->databaseName = $databaseName ;
         $this->alias = $alias ;
+        $this->primary[] = "id" ;
         
     }
     
@@ -50,15 +59,30 @@ class DbTable
         }
         
         $str .= $this->name ;
-        
-        if( !empty($this->alias) ){
-            
-            $str .= " as " . $this->alias ;
-                
-        }
-        
+              
         return $str ;
         
+    }
+    
+    public function getAliasString()
+    {
+       if( !empty($this->alias) ){
+            
+            return " as " . $this->alias ;
+                
+        } 
+        return "" ;
+    }
+    
+    
+    public function field( $name )
+    {
+        if( !empty($this->alias) ){
+            
+            return $this->alias . "." . $name ;
+        }
+        
+        return (string) $this . "." . $name ;
     }
     
     public function getDatabaseName()
@@ -69,5 +93,99 @@ class DbTable
     public function setDatabaseName( $name )
     {
         $this->databaseName = $name ;
+    }
+    
+    public function columns( $columns )
+    {
+        $this->fields = $columns ;
+        
+        return $this ;
+    }
+    
+    public function primary( $column )
+    {
+        $this->primary[] = $column ;
+        
+        return $this ;
+    }
+    
+    public function unique( $column )
+    {
+        $this->unique[] = $column ;
+        
+        return $this ;
+    }
+    
+    public function readOnly( $column )
+    {
+        $this->readonly[] = $column ;
+        
+        return $this ;
+    }
+    
+    public function relational( $column )
+    {
+        $this->relational[] = $column ;
+        
+        return $this ;
+    }
+    
+    public function getTable()
+    {
+        return $this->table ;
+    }
+    
+    public function getFields()
+    {
+        return $this->fields ;
+    }
+    
+    public function getWriteableFields()
+    {
+        return array_diff( $this->fields, $this->readonly ) ;
+    }
+    
+    public function isPrimaryKey($field)
+    {
+        return in_array($field, $this->primary ) ;
+    }
+    
+     public function isUnique($field)
+    {
+       // return ( in_array($field, $this->primary ) || in_array($field, $this->unique ) ) ;
+        
+        return in_array($this->getUnique() );
+    }
+    
+    public function isRelational( $field )
+    {
+        return in_array($field, $this->relational ) ;
+    }
+              
+    public function getPrimaryKeys()
+    {
+        return $this->primary ;
+    }
+    
+    public function getUnique()
+    {
+        return array_merge( $this->primary, $this->unique ) ;
+    }
+    
+    public function getName()
+    {
+        return $this->name ;
+    }
+    
+    public function unescaped($field)
+    {
+        $this->unescaped[] = $field ;
+        
+        return $this ;
+    }
+    
+    public function isUnescaped($field)
+    {
+        return in_array($field, $this->unescaped) ;
     }
 }

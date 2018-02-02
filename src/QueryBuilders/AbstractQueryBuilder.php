@@ -24,8 +24,9 @@ use Vinosa\Repo\RepositoryInterface ;
  *
  * @author vinosa
  */
-class AbstractQueryBuilder implements QueryBuilderInterface
+abstract class AbstractQueryBuilder implements QueryBuilderInterface
 {
+    //put your code here
     protected $repository ;
        
     protected $start = 0;
@@ -33,7 +34,7 @@ class AbstractQueryBuilder implements QueryBuilderInterface
     protected $whereClause ;
     protected $fields = array() ;
        
-    public function __construct(RepositoryInterface $repository )
+     public function __construct(RepositoryInterface $repository )
     {
         $this->repository = $repository ;
         
@@ -53,7 +54,7 @@ class AbstractQueryBuilder implements QueryBuilderInterface
         
         if($name == "get" || $name == "fetch" || $name == "count"){
             
-            $arguments[] = $this ;
+            array_unshift($arguments, $this) ;
             
             return call_user_func_array(array( $this->repository, $name), $arguments ) ;
             
@@ -145,4 +146,6 @@ class AbstractQueryBuilder implements QueryBuilderInterface
     {
         return $this->whereClause ;
     }
+    
+        
 }
