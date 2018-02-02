@@ -152,9 +152,9 @@ class DbTable
     
      public function isUnique($field)
     {
-       // return ( in_array($field, $this->primary ) || in_array($field, $this->unique ) ) ;
+      
+        return \in_array($field, $this->getUnique() );
         
-        return in_array($this->getUnique() );
     }
     
     public function isRelational( $field )
