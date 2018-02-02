@@ -21,7 +21,7 @@ namespace Vinosa\Repo\Model;
 
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
 use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
-use Vinosa\Repo\Schema\DbSchema ;
+use Vinosa\Repo\Schema\DbTable ;
 use Vinosa\Repo\Exceptions\EmptyFieldException ;
 
 /**
@@ -32,39 +32,33 @@ use Vinosa\Repo\Exceptions\EmptyFieldException ;
 class AbstractGenericEntity
 {
     
-    public function getDbSchema()
-    {
-              
-        return (new DbSchema() )->primary( "id" )
-                                 ;
-        
-    }
     
-    protected function querySql(SqlQueryBuilder $query )
+    public function query(SqlQueryBuilder $query)
     {
-        $schema = $this->getDbSchema() ;
+        $table = $this->getTable() ;
         
-        if( !is_null( $schema->getTable()  ) ){
+        if( is_null($table) ){
             
-            $query = $query->insertTo( $schema->getTable() )
-                            ->from( $schema->getTable() ) ;
-            
+            return $query ;
         }
-                    
-        foreach($schema->getWriteableFields() as  $key ){
+                     
+        $query = $query->flushTables()
+                       ->from( $this->getTable() ) ;
+                               
+        foreach($table->getWriteableFields() as  $key ){
             
             try{
                 $value = $query->quote( $this->__get($key) );
             
-                if( $schema->isRelational( $key ) ){
+                if( $table->isUnescaped( $key ) ){
                 
                     $value = $this->__get($key) ;
                  
                 }
             
-                $query->insert["`{$key}`"] = $value ;
-                       
-                if( !$schema->isPrimaryKey($key) ){
+                $query->insert["`{$key}`"] = $value ;                      
+           
+                if( !$table->isUnique($key) ){
                 
                     $query->update["`{$key}`"] =  "`{$key}`=" . $value;
                 }
@@ -74,7 +68,7 @@ class AbstractGenericEntity
                        
         }
                
-        foreach($schema->getPrimaryKeys() as $key ){
+        foreach($table->getUnique() as $key ){
             try{
                 
                 $query = $query->where($key, $this->__get( $key ) )  ;
@@ -85,21 +79,6 @@ class AbstractGenericEntity
         }
                
         return $query ;
-    }
-    
-    
-    public function query(QueryBuilderInterface $query)
-    {
-        if(is_a($query, SqlQueryBuilder::class)){
-            
-            return $this->querySql( $query );
-            
-        }
-        if(is_a($query, SolrQueryBuilder::class)){
-            
-            return $this->querySolr( $query );
-            
-        }
     }
       
     
