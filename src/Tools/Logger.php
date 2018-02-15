@@ -26,13 +26,12 @@ namespace Vinosa\Repo\Tools;
  */
 class Logger implements LoggerInterface
 {
-    protected $activated ;
+    protected $activated = true ;
     protected $timer ;
     
-    public function __construct($activated = false)
+    public function __construct()
     {
        
-        $this->activated = $activated ;
         
          $this->timer = new Timer() ;
     }
@@ -56,5 +55,15 @@ class Logger implements LoggerInterface
         $this->timer->end() ;
          
         return (string) $this->timer ;
+    }
+    
+    public function error($txt)
+    {
+        $this->log( $txt ) ;
+    }
+    
+    private function log($txt)
+    {
+        echo $txt ;
     }
 }

@@ -19,14 +19,18 @@
 
 namespace Vinosa\Repo\Model;
 
+use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+
 /**
  * Description of EntityInterface
  *
  * @author vinosa
  */
-class EntityInterface
+interface EntityInterface
 {
-     public function __get($field) ;
+    public function __get($field) ;
     
     public function __set($field, $value) ;
+    
+    public function query(SqlQueryBuilder $query) ;
 }

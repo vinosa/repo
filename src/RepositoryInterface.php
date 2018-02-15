@@ -32,7 +32,7 @@ interface RepositoryInterface
     
     public function query() ;
     
-    public function get( $class, QueryBuilderInterface $builder ) ;
+    public function get(  QueryBuilderInterface $builder, $class ) ;
     
-    public function fetch( $class, QueryBuilderInterface $builder ) ;
+    public function fetch(  QueryBuilderInterface $builder, $class ) ;
 }

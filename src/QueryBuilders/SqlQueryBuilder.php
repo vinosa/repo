@@ -19,8 +19,8 @@
 
 namespace Vinosa\Repo\QueryBuilders ;
 
-use Vinosa\Repo\DbRepository ;
-use Vinosa\Repo\Schema\DbTable ;
+use Vinosa\Repo\DatabaseRepository ;
+use Vinosa\Repo\DatabaseTable ;
 use Vinosa\Repo\Exceptions\QueryBuilderException ;
 
 /**
@@ -37,13 +37,13 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     protected $tables = [] ;
     
     
-    public function __construct(DbRepository $repository)
+    public function __construct(DatabaseRepository $repository)
     {
         parent::__construct( $repository );
         
     }
     
-     public function from(DbTable $table)
+     public function from(DatabaseTable $table)
     {
                     
         if( !in_array( $this->checkDatabaseName( $table ), $this->tables ) ){
@@ -62,14 +62,14 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $this ;
     }
     
-    public function join(DbTable $table)
+    public function join(DatabaseTable $table)
     {
         $this->join .= " JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
         
         return $this ;
     }
     
-    public function leftOuterJoin(DbTable $table)
+    public function leftOuterJoin(DatabaseTable $table)
     {
         $this->join .= " LEFT OUTER JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
         
@@ -186,7 +186,7 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         
     }
     
-    private function checkDatabaseName(DbTable $table)
+    private function checkDatabaseName(DatabaseTable $table)
     {
         if( empty($table->getDatabaseName() ) ){
             

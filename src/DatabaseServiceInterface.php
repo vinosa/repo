@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2018 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Vinosa\Repo\Model ;
 
-use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+namespace Vinosa\Repo;
+
 /**
- * Description of GenericEntity
  *
- * @author vinosa
+ * @author vinogradov
  */
-class GenericEntity extends AbstractGenericEntity
+interface DatabaseServiceInterface
 {
-    //put your code here
-    public function test()
-    {
-        echo "coucou" ;
-    }
+    public function fetchRows( $sql ) ;
     
-    public function query(SqlQueryBuilder $query)
-    {
-        return $query ;
-    }
+    public function getRow( $sql ) ;
+    
+    public function getDatabaseName() ;
+    
+    public function execute( $sql ) ;
+    
+    public function quote( $str );
 }
