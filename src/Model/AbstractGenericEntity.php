@@ -22,6 +22,7 @@ namespace Vinosa\Repo\Model;
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
 use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
 use Vinosa\Repo\Exceptions\EmptyFieldException ;
+use Vinosa\Repo\RepositoryInterface ;
 
 /**
  * Description of AbstractGenericEntity
@@ -49,6 +50,11 @@ class AbstractGenericEntity implements EntityInterface
         
         throw new EmptyFieldException ("unset field " . $name . print_r($this,true) ) ;
         
+    }
+    
+    public function setSource(RepositoryInterface $source)
+    {
+        $this->source = $source ;
     }
     
     public function query(SqlQueryBuilder $query)

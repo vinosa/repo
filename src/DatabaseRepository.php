@@ -18,13 +18,11 @@
  */
 namespace Vinosa\Repo ;
 
-use Vinosa\Repo\Adapters\AdapterInterface ;
-use Vinosa\Repo\Exceptions\AdapterException ;
+
 use Vinosa\Repo\Model\EntityInterface ;
 use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
-use Vinosa\Repo\Tools\LoggerInterface ;
-use Vinosa\Repo\Model\GenericEntity ;
+
 
 /**
  * Description of DbRepository
@@ -45,26 +43,24 @@ class DatabaseRepository implements RepositoryInterface
         $this->prototype = $prototype ;
     } 
     
-    private function createNew( $class = null)
+    private function createNew( )
     {
-        if( is_null($class) ){
-            
-            //return new GenericEntity() ;
-            
-            return clone $this->prototype ;
-        }
-        
-        return new $class ;
-        
+                  
+       $new = clone $this->prototype ;
+       
+       $new->setSource( $this ) ;
+       
+       return $new ;
+             
     }
     
-    private function createNewFromRow( $row, $class = null )
+    private function createNewFromRow( $row )
     {
-        $new = $this->createNew( $class ) ;
+        $new = $this->createNew( ) ;
         
-        foreach($row as $key => $val){
+        foreach($row as $key => $value){
             
-            $new->__set($val, $key) ;
+            $new->__set($key, $value) ;
         }
         
         return $new ;
@@ -100,10 +96,10 @@ class DatabaseRepository implements RepositoryInterface
            
     }
     
-    public function get( QueryBuilderInterface $query, $class = null )
+    public function get(QueryBuilderInterface $query )
     {
         
-        $sql = $this->createNew( $class )
+        $sql = $this->createNew( )
                        ->query( $query )
                        ->limit(1)
                        ->getQuerySelect() ;
@@ -112,15 +108,15 @@ class DatabaseRepository implements RepositoryInterface
         $row = $this->service->getRow( $sql );
             
                                             
-        return  $this->createNewFromRow( $row, $class) ;
+        return  $this->createNewFromRow( $row ) ;
                     
     }
     
-    public function fetch( QueryBuilderInterface $builder, $class = null)
+    public function fetch( QueryBuilderInterface $query )
     {
               
-        $sql = $this->createNew( $class)
-                     ->query( $builder )
+        $sql = $this->createNew( )
+                     ->query( $query )
                      ->getQuerySelect() ;
               
         
@@ -130,7 +126,7 @@ class DatabaseRepository implements RepositoryInterface
             
         foreach($rows as $row){
             
-            $result[] = $this->createNewFromRow( $row, $class) ;
+            $result[] = $this->createNewFromRow( $row ) ;
         }
                                 
        return $result ;              
@@ -141,41 +137,16 @@ class DatabaseRepository implements RepositoryInterface
         $sql = $entity->query( $this->query() )
                         ->getQueryDelete();
                
-        $result = $this->service ->execute( $sql );
+        $result = $this->service->execute( $sql );
         
         
     }
     
-    /*public function count( $class, QueryBuilderInterface $builder )
-    {
-              
-       $query = $this->createNew( $class )
-                     ->query( $builder )
-                     ->getQueryCount() ;
-            
-        try{
-            $this->startTimer() ;
-            
-            $result = $this->getAdapter() ->query( $query );
-            
-            $this->logQuery( $query ) ;
-            
-            return $result->fetchColumn() ;
-
-        } 
-        catch (AdapterException $ex) {
-            
-            $this->logQuery( $query ) ;
-            
-            throw new RepositoryException( $ex->getMessage() . " " . $query );
-        }
-        
-    }*/
     
     public function query()
     {
         
-        return new SqlQueryBuilder( $this, $this->getDatabaseName() ) ;
+        return new SqlQueryBuilder( $this ) ;
     }
     
     public function quote( $var )

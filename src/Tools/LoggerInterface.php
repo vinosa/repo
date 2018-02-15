@@ -27,11 +27,8 @@ namespace Vinosa\Repo\Tools;
 interface LoggerInterface
 {
     //put your code here
-    public function debug( $msg ) ;
+    public function debug( $txt ) ;
     
-    public function error($txt) ;
+    public function error( $txt ) ;
     
-    public function startTimer();
-    
-    public function getDuration() ;
 }

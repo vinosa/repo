@@ -43,15 +43,23 @@ class PdoDatabaseService implements DatabaseServiceInterface
     {
         $str = "mysql:host=" . $this->configuration->getHost() .
                ";dbname=" . $this->configuration->getDatabaseName() ;
-               
-        $this->pdo = new \PDO($str, $this->configuration->getUser(), $this->configuration->getPassword() );
+        
+        try{
+            
+            $this->pdo = new \PDO($str, $this->configuration->getUser(), $this->configuration->getPassword() );
+            
+        } catch (\PDOException $ex) {
+            
+            throw new DatabaseException( $ex->getMessage() );
+        }
+        
     }
     
     public function fetchRows( $sql )
     {
         $result = $this->query( $sql ) ;
         
-        $rows  = $result->fetchAll() ;
+        $rows  = $result->fetchAll(\PDO::FETCH_ASSOC) ;
         
         return $rows ;
     }
@@ -60,7 +68,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     {
         $result = $this->query( $sql ) ;
         
-        $row  = $result->fetch() ;
+        $row  = $result->fetch(\PDO::FETCH_ASSOC) ;
         
         return $row ;
     }

@@ -20,6 +20,7 @@
 namespace Vinosa\Repo\Model;
 
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+use Vinosa\Repo\RepositoryInterface ;
 
 /**
  * Description of EntityInterface
@@ -33,4 +34,6 @@ interface EntityInterface
     public function __set($field, $value) ;
     
     public function query(SqlQueryBuilder $query) ;
+    
+    public function setSource(RepositoryInterface $source) ;
 }
