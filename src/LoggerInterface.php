@@ -16,24 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Vinosa\Repo\Model ;
 
-use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+namespace Vinosa\Repo;
+
 /**
- * Description of GenericEntity
+ * Description of LoggerInterface
  *
  * @author vinosa
  */
-class GenericEntity extends AbstractGenericEntity
+interface LoggerInterface
 {
-    //put your code here
-    public function test()
-    {
-        echo "coucou" ;
-    }
     
-    public function query(SqlQueryBuilder $query)
-    {
-        return $query ;
-    }
+    public function debug($message, array $context = array());
+    
+    public function error($message, array $context = array());
+    
 }

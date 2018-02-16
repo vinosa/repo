@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2018 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Model;
+namespace Vinosa\Repo;
 
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
-use Vinosa\Repo\RepositoryInterface ;
 
 /**
- * Description of EntityInterface
+ * Description of DatabaseEntityInterface
  *
- * @author vinosa
+ * @author vinogradov
  */
-interface EntityInterface
+interface DatabaseEntityInterface
 {
     public function __get($field) ;
     

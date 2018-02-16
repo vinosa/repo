@@ -18,8 +18,6 @@
  */
 namespace Vinosa\Repo ;
 
-
-use Vinosa\Repo\Model\EntityInterface ;
 use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
 
@@ -33,9 +31,10 @@ class DatabaseRepository implements RepositoryInterface
 {
     
     protected $service ;
-    protected $prototype ;
+    protected $prototype = null ;
+    protected $class = DatabaseGenericEntity::class ;
       
-    public function __construct(DatabaseServiceInterface $service, EntityInterface $prototype )
+    public function __construct(DatabaseServiceInterface $service, $prototype = null )
     {
         
         $this->service = $service;
@@ -45,8 +44,17 @@ class DatabaseRepository implements RepositoryInterface
     
     private function createNew( )
     {
-                  
-       $new = clone $this->prototype ;
+             
+       if(!is_null($this->prototype)) { 
+           
+            $new = clone $this->prototype ;
+       
+       }
+       else{
+           
+           $new = new $this->class ;
+           
+       }
        
        $new->setSource( $this ) ;
        
@@ -65,35 +73,33 @@ class DatabaseRepository implements RepositoryInterface
         
         return $new ;
     }
-          
-       
+    
+     
     public function getDatabaseName()
     {
         return $this->service->getDatabaseName() ;
     }
        
-    public function save(EntityInterface $entity )
+    public function save(DatabaseEntityInterface $entity )
     {     
                 
         $sql = $entity->query( $this->query() ) 
                             ->getQueryInsert() ;
                                            
             
-        $result = $this->service->execute( $sql );
-                                                           
-                   
+        return $this->service->execute( $sql );
+                                                                              
     }
     
-    public function update(EntityInterface $entity )
+    public function update(DatabaseEntityInterface $entity )
     {
                   
         $sql = $entity->query( $this->query() ) 
                             ->getQueryUpdate() ;
                        
         
-        $result = $this->service ->execute( $sql );
-                       
-           
+        return $this->service ->execute( $sql );
+                                 
     }
     
     public function get(QueryBuilderInterface $query )
@@ -104,11 +110,8 @@ class DatabaseRepository implements RepositoryInterface
                        ->limit(1)
                        ->getQuerySelect() ;
               
-                   
-        $row = $this->service->getRow( $sql );
-            
-                                            
-        return  $this->createNewFromRow( $row ) ;
+                                                                         
+        return  $this->createNewFromRow( $this->service->getRow( $sql ) ) ;
                     
     }
     
@@ -132,14 +135,13 @@ class DatabaseRepository implements RepositoryInterface
        return $result ;              
     }
     
-    public function delete(EntityInterface $entity)
+    public function delete(DatabaseEntityInterface $entity)
     {
         $sql = $entity->query( $this->query() )
                         ->getQueryDelete();
                
-        $result = $this->service->execute( $sql );
-        
-        
+        return $this->service->execute( $sql );
+               
     }
     
     

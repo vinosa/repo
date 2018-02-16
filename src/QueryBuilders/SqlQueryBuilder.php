@@ -21,7 +21,6 @@ namespace Vinosa\Repo\QueryBuilders ;
 
 use Vinosa\Repo\DatabaseRepository ;
 use Vinosa\Repo\DatabaseTable ;
-use Vinosa\Repo\Exceptions\QueryBuilderException ;
 
 /**
  * Description of SqlQueryBuilder

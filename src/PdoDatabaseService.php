@@ -19,7 +19,6 @@
 
 namespace Vinosa\Repo;
 
-use Vinosa\Repo\Tools\LoggerInterface ;
 
 /**
  * Description of DatabaseService

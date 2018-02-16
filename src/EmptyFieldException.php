@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2018 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Tools;
+namespace Vinosa\Repo;
 
 /**
- * Description of LoggerInterface
+ * Description of EmptyFieldException
  *
- * @author vinosa
+ * @author vinogradov
  */
-interface LoggerInterface
+class EmptyFieldException extends \Exception
 {
     //put your code here
-    public function debug( $txt ) ;
-    
-    public function error( $txt ) ;
-    
 }

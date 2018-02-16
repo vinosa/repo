@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2018 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Model;
+namespace Vinosa\Repo;
 
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
-use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
-use Vinosa\Repo\Exceptions\EmptyFieldException ;
-use Vinosa\Repo\RepositoryInterface ;
 
 /**
- * Description of AbstractGenericEntity
+ * Description of DatabaseGenericEntity
  *
- * @author vinosa
+ * @author vinogradov
  */
-class AbstractGenericEntity implements EntityInterface
+class DatabaseGenericEntity implements DatabaseEntityInterface
 {
     protected $fields = [];
     protected $source = null ;
@@ -48,7 +45,7 @@ class AbstractGenericEntity implements EntityInterface
             return $this->fields[$name] ;
         } 
         
-        throw new EmptyFieldException ("unset field " . $name . print_r($this,true) ) ;
+        throw new EmptyFieldException ("unset field " . $name . " " . $this  ) ;
         
     }
     
@@ -57,15 +54,31 @@ class AbstractGenericEntity implements EntityInterface
         $this->source = $source ;
     }
     
+    public function __toString()
+    {
+         $str = get_class( $this ) . " :\n" ;
+         
+         foreach($this->fields as $key => $value){
+             
+             $str .= $key . " -> " . $value . "\n" ;
+                        
+         }
+         
+         $str .= "\n" ;
+         
+         return $str ;
+    }
+    
     public function query(SqlQueryBuilder $query)
     {
-        $table = $this->getTable() ;
-        
-        if( is_null($table) ){
+        if(!method_exists($this, "getTable")){
             
             return $query ;
+            
         }
-                     
+        
+        $table = $this->getTable() ;
+                             
         $query = $query->flushTables()
                        ->from( $this->getTable() ) ;
                                
@@ -104,7 +117,4 @@ class AbstractGenericEntity implements EntityInterface
                
         return $query ;
     }
-      
-    
-    
 }
