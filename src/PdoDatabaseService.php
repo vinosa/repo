@@ -31,7 +31,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     private $pdo = null;
     private $logger ;
     
-    public function __construct(DatabaseConfiguration $configuration, LoggerInterface $logger)
+    public function __construct(DatabaseConfiguration $configuration, LoggerInterface $logger = null)
     {
         $this->configuration = $configuration ;
         
@@ -56,20 +56,16 @@ class PdoDatabaseService implements DatabaseServiceInterface
     
     public function fetchRows( $sql )
     {
-        $result = $this->query( $sql ) ;
+              
+        return $this->query( $sql )->fetchAll(\PDO::FETCH_ASSOC) ;
         
-        $rows  = $result->fetchAll(\PDO::FETCH_ASSOC) ;
-        
-        return $rows ;
     }
     
     public function getRow( $sql )
     {
-        $result = $this->query( $sql ) ;
+       
+        return $this->query( $sql )->fetch(\PDO::FETCH_ASSOC) ;
         
-        $row  = $result->fetch(\PDO::FETCH_ASSOC) ;
-        
-        return $row ;
     }
     
     public function getDatabaseName()
@@ -79,7 +75,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     
     public function execute( $sql )
     {
-        $this->query($sql) ;
+        return $this->query($sql) ;
     }
     
     public function quote( $str)
@@ -101,24 +97,42 @@ class PdoDatabaseService implements DatabaseServiceInterface
     {
         try{
             
-            $result = $this->getPdo()->query( $sql ) ;
+            $pdoStatement = $this->getPdo()->query( $sql ) ;
             
-            $this->logger->debug( $sql ) ;
+            $this->logSql( $sql );
             
-            if($result->rowCount() == 0){
+            if($pdoStatement->rowCount() == 0){
                 
-                throw new ObjectNotFoundException( $query . " returned 0 results" ) ; 
+                throw new ObjectNotFoundException( $sql . " returned 0 results" ) ; 
            }
         
-            return $result ;
+            return $pdoStatement ;
             
         } catch (\PDOException $ex) {
             
-            $this->logger->error( $ex->getMessage() );
+            $this->logError( $ex->getMessage() );
             
             throw new DatabaseException( $ex->getMessage() );
             
         }
         
+    }
+    
+    private function logSql($sql)
+    {
+        if(!is_null($this->logger)){
+            
+            $this->logger->debug( $sql ) ;
+            
+        }
+    }
+    
+    private function logError($message)
+    {
+        if(!is_null($this->logger)){
+            
+            $this->logger->error( $message ) ;
+            
+        }
     }
 }
