@@ -19,34 +19,21 @@
 
 namespace Vinosa\Repo\Database;
 
+use Vinosa\Repo\AbstractConfiguration ;
+
 /**
  * Description of DatabaseConfiguration
  *
  * @author vinogradov
  */
-class DatabaseConfiguration
+class DatabaseConfiguration extends AbstractConfiguration
 {
-    protected $config = [];
     
     const HOST = "host";
     const USER = "user" ;
     const PASSWORD = "password";
     const DBNAME = "dbname" ;
     
-    public function get($name)
-    {
-        if( isset( $this->config[$name] ) ){
-            
-            return $this->config[ $name ] ;
-        }
-        
-        throw new \Exception("undefined configuration " . $name) ;
-    }
-    
-    public function set($name, $value)
-    {
-        $this->config[$name] = $value ;
-    }
     
     public function getHost()
     {

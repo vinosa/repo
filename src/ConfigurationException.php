@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2017 vinosa
+ * Copyright (C) 2018 vinogradov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\QueryBuilders ;
+namespace Vinosa\Repo;
 
 /**
- * Description of QueryBuilderInterface
+ * Description of ConfigurationException
  *
- * @author vinosa
+ * @author vinogradov
  */
-interface QueryInterface
+class ConfigurationException extends \Exception
 {
-    public function start($start) ;
-    
-    public function limit($limit) ;
-    
-    public function quote( $unsafeString ) ;
-    
-    public function select($fields) ;
-    
-    public function getClause() ;
+    //put your code here
 }

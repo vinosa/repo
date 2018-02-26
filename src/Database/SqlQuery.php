@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\QueryBuilders ;
+namespace Vinosa\Repo\Database ;
 
-use Vinosa\Repo\Database\DatabaseRepository ;
-use Vinosa\Repo\Database\DatabaseTable ;
+use Vinosa\Repo\AbstractQuery ;
+use Vinosa\Repo\QueryException ;
+
 
 /**
- * Description of SqlQueryBuilder
+ * Description of SqlQuery
  *
  * @author vinosa
  */
@@ -102,7 +103,7 @@ class SqlQuery extends AbstractQuery
             
             $q .= " WHERE " . $this->whereClause->output();           
             
-        } catch (QueryBuilderException $ex) {
+        } catch (QueryException $ex) {
 
         }
         
@@ -153,7 +154,7 @@ class SqlQuery extends AbstractQuery
             
             $q .= " WHERE " . $this->whereClause->output();           
             
-        } catch (QueryBuilderException $ex) {
+        } catch (QueryException $ex) {
 
         }
         
@@ -211,7 +212,7 @@ class SqlQuery extends AbstractQuery
        
         if( count($this->tables) == 0 ){
             
-            throw new QueryBuilderException( "Empty Table " . print_r($this,true) );
+            throw new QueryException( "Empty Table " . print_r($this,true) );
             
         }
         

@@ -19,7 +19,7 @@
 
 namespace Vinosa\Repo\Database;
 
-use Vinosa\Repo\QueryBuilders\SqlQuery ;
+
 use Vinosa\Repo\RepositoryInterface ;
 use Vinosa\Repo\EmptyFieldException ;
 

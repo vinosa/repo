@@ -17,24 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\QueryBuilders ;
+namespace Vinosa\Repo ;
 
-use Vinosa\Repo\Exceptions\QueryBuilderException ;
+
 
 /**
  * Description of WhereClause
  *
  * @author vinosa
  */
-class WhereClause
+class AbstractWhereClause
 {
 
     private $wheres = [];
-    private $builder ;
+    private $query ;
       
-    public function __construct(QueryInterface $builder )
+    public function __construct(QueryInterface $query )
     {
-        $this->builder = $builder ;
+        $this->query = $query ;
     }
     
     
@@ -43,7 +43,7 @@ class WhereClause
        
         if(count($this->wheres) == 0){
             
-            throw new QueryBuilderException("empty where clause") ;
+            throw new QueryException("empty where clause") ;
             
         }
         
@@ -86,12 +86,12 @@ class WhereClause
     {
         if( is_object($col) ){
             
-            if(is_a($col, WhereClause::class)){
+            if(is_a($col, AbstractWhereClause::class)){
                 
                 $where = $col ;
             }
             
-            if(is_a($col, QueryBuilderInterface::class)){
+            if(is_a($col, QueryInterface::class)){
                 
                 $where = $col->getClause() ;
             
@@ -153,7 +153,7 @@ class WhereClause
             return $var;
             
         }
-        return $this->builder->quote( $var );
+        return $this->query->quote( $var );
     }
     
     

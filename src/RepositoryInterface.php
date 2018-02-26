@@ -19,7 +19,6 @@
 
 namespace Vinosa\Repo;
 
-use Vinosa\Repo\QueryBuilders\QueryInterface ;
 
 /**
  * Description of RepositoryInterface

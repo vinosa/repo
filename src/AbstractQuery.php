@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Vinosa\Repo\QueryBuilders ;
+namespace Vinosa\Repo ;
 
 use Vinosa\Repo\RepositoryInterface ;
 /**
- * Description of AbstractQueryBuilder
+ * Description of AbstractQuery
  *
  * @author vinosa
  */
@@ -34,13 +34,6 @@ abstract class AbstractQuery implements QueryInterface
     protected $whereClause ;
     protected $fields = array() ;
        
-    public function __construct(RepositoryInterface $repository )
-    {
-        $this->repository = $repository ;
-        
-        $this->whereClause = new WhereClause( $this ) ;
-
-    }
     
     public function __call($name, $arguments)
     {
@@ -129,13 +122,8 @@ abstract class AbstractQuery implements QueryInterface
     {
         return $this->limit ;
     }
-       
-    public function nest( )
-    {
-        return new WhereClause($this) ;
-    }
-    
-     public function quote( $unsafeString )
+           
+    public function quote( $unsafeString )
     {
         
         return $this->getRepository() ->quote( $unsafeString );

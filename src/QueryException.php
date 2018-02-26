@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 vinogradov
+ * Copyright (C) 2017 vinosa
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Database;
-
-use Vinosa\Repo\RepositoryInterface ;
+namespace Vinosa\Repo;
 
 /**
- * Description of DatabaseEntityInterface
+ * Description of QueryException
  *
- * @author vinogradov
+ * @author vinosa
  */
-interface DatabaseEntityInterface
+class QueryException extends \Exception
 {
-    public function __get($field) ;
-    
-    public function __set($field, $value) ;
-    
-    public function query(SqlQuery $query) ;
-    
-    public function setSource(RepositoryInterface $source) ;
+    //put your code here
 }

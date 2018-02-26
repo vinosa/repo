@@ -18,8 +18,7 @@
  */
 namespace Vinosa\Repo\Database ;
 
-use Vinosa\Repo\QueryBuilders\QueryInterface ;
-use Vinosa\Repo\QueryBuilders\SqlQuery ;
+use Vinosa\Repo\QueryInterface ;
 use Vinosa\Repo\RepositoryInterface ;
 
 

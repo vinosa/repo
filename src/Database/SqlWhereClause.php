@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\QueryBuilders;
+namespace Vinosa\Repo\Database;
+
+use Vinosa\Repo\AbstractWhereClause ;
 
 /**
  * Description of SqlWhereClause
  *
  * @author vinogradov
  */
-class SqlWhereClause extends WhereClause
+class SqlWhereClause extends AbstractWhereClause
 {
     public function whereNotNull( $col )
     {

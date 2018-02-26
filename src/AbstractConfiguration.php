@@ -17,22 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Database;
-
-use Vinosa\Repo\RepositoryInterface ;
+namespace Vinosa\Repo;
 
 /**
- * Description of DatabaseEntityInterface
+ * Description of AbstractConfiguration
  *
  * @author vinogradov
  */
-interface DatabaseEntityInterface
+class AbstractConfiguration
 {
-    public function __get($field) ;
+    protected $config;
     
-    public function __set($field, $value) ;
+    public function __construct( $config = [] )
+    {
+        $this->config = $config;
+    }
     
-    public function query(SqlQuery $query) ;
+    public function get($name, $defaultValue = null)
+    {
+        if( isset( $this->config[$name] ) ){
+            
+            return $this->config[ $name ] ;
+        }
+        
+        if( !is_null($defaultValue) ){
+            
+            return $defaultValue ;
+        }
+        
+        throw new ConfigurationException("undefined configuration " . $name) ;
+    }
     
-    public function setSource(RepositoryInterface $source) ;
+    public function set($name, $value)
+    {
+        $this->config[$name] = $value ;
+    }
 }
