@@ -18,8 +18,8 @@
  */
 namespace Vinosa\Repo\Database ;
 
-use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
-use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+use Vinosa\Repo\QueryBuilders\QueryInterface ;
+use Vinosa\Repo\QueryBuilders\SqlQuery ;
 use Vinosa\Repo\RepositoryInterface ;
 
 
@@ -103,7 +103,7 @@ class DatabaseRepository implements RepositoryInterface
                                  
     }
     
-    public function get(QueryBuilderInterface $query )
+    public function get(QueryInterface $query )
     {
         
         $sql = $this->createNew( )
@@ -116,7 +116,7 @@ class DatabaseRepository implements RepositoryInterface
                     
     }
     
-    public function fetch( QueryBuilderInterface $query )
+    public function fetch( QueryInterface $query )
     {
               
         $sql = $this->createNew( )
@@ -149,7 +149,7 @@ class DatabaseRepository implements RepositoryInterface
     public function query()
     {
         
-        return new SqlQueryBuilder( $this ) ;
+        return new SqlQuery( $this ) ;
     }
     
     public function quote( $var )

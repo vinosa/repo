@@ -27,7 +27,7 @@ use Vinosa\Repo\Database\DatabaseTable ;
  *
  * @author vinosa
  */
-class SqlQueryBuilder extends AbstractQueryBuilder
+class SqlQuery extends AbstractQuery
 {
      
     public $insert = [];

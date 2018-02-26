@@ -32,7 +32,7 @@ class WhereClause
     private $wheres = [];
     private $builder ;
       
-    public function __construct(QueryBuilderInterface $builder )
+    public function __construct(QueryInterface $builder )
     {
         $this->builder = $builder ;
     }

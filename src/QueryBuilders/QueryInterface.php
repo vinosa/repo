@@ -17,14 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\QueryBuilders;
+namespace Vinosa\Repo\QueryBuilders ;
 
 /**
- * Description of QueryBuilderException
+ * Description of QueryBuilderInterface
  *
  * @author vinosa
  */
-class QueryBuilderException extends \Exception
+interface QueryInterface
 {
-    //put your code here
+    public function start($start) ;
+    
+    public function limit($limit) ;
+    
+    public function quote( $unsafeString ) ;
+    
+    public function select($fields) ;
+    
+    public function getClause() ;
 }

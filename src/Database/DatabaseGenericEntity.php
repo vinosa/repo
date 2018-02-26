@@ -19,7 +19,7 @@
 
 namespace Vinosa\Repo\Database;
 
-use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+use Vinosa\Repo\QueryBuilders\SqlQuery ;
 use Vinosa\Repo\RepositoryInterface ;
 use Vinosa\Repo\EmptyFieldException ;
 
@@ -71,7 +71,7 @@ class DatabaseGenericEntity implements DatabaseEntityInterface
          return $str ;
     }
     
-    public function query(SqlQueryBuilder $query)
+    public function query(SqlQuery $query)
     {
         if(!method_exists($this, "getTable")){
             

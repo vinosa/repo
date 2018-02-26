@@ -19,7 +19,7 @@
 
 namespace Vinosa\Repo;
 
-use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
+use Vinosa\Repo\QueryBuilders\QueryInterface ;
 
 /**
  * Description of RepositoryInterface
@@ -32,7 +32,7 @@ interface RepositoryInterface
     
     public function query() ;
     
-    public function get(  QueryBuilderInterface $builder ) ;
+    public function get(  QueryInterface $builder ) ;
     
-    public function fetch(  QueryBuilderInterface $builder ) ;
+    public function fetch(  QueryInterface $builder ) ;
 }

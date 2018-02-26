@@ -24,7 +24,7 @@ use Vinosa\Repo\RepositoryInterface ;
  *
  * @author vinosa
  */
-abstract class AbstractQueryBuilder implements QueryBuilderInterface
+abstract class AbstractQuery implements QueryInterface
 {
     //put your code here
     protected $repository ;
