@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
+namespace Vinosa\Repo\Database;
 
+use Vinosa\Repo\LoggerInterface ;
+use Vinosa\Repo\ObjectNotFoundException ;
 
 /**
  * Description of DatabaseService

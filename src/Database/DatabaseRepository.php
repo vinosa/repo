@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Vinosa\Repo ;
+namespace Vinosa\Repo\Database ;
 
 use Vinosa\Repo\QueryBuilders\QueryBuilderInterface ;
 use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+use Vinosa\Repo\RepositoryInterface ;
 
 
 /**

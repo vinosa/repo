@@ -17,22 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
-
-use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+namespace Vinosa\Repo\Database;
 
 /**
- * Description of DatabaseEntityInterface
+ * Description of DatabaseException
  *
  * @author vinogradov
  */
-interface DatabaseEntityInterface
+class DatabaseException extends \Exception
 {
-    public function __get($field) ;
-    
-    public function __set($field, $value) ;
-    
-    public function query(SqlQueryBuilder $query) ;
-    
-    public function setSource(RepositoryInterface $source) ;
+    //put your code here
 }

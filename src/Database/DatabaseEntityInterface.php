@@ -17,21 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
+namespace Vinosa\Repo\Database;
+
+use Vinosa\Repo\QueryBuilders\SqlQueryBuilder ;
+use Vinosa\Repo\RepositoryInterface ;
 
 /**
+ * Description of DatabaseEntityInterface
  *
  * @author vinogradov
  */
-interface DatabaseServiceInterface
+interface DatabaseEntityInterface
 {
-    public function fetchRows( $sql ) ;
+    public function __get($field) ;
     
-    public function getRow( $sql ) ;
+    public function __set($field, $value) ;
     
-    public function getDatabaseName() ;
+    public function query(SqlQueryBuilder $query) ;
     
-    public function execute( $sql ) ;
-    
-    public function quote( $str );
+    public function setSource(RepositoryInterface $source) ;
 }

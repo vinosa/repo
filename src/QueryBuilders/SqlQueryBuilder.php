@@ -19,8 +19,8 @@
 
 namespace Vinosa\Repo\QueryBuilders ;
 
-use Vinosa\Repo\DatabaseRepository ;
-use Vinosa\Repo\DatabaseTable ;
+use Vinosa\Repo\Database\DatabaseRepository ;
+use Vinosa\Repo\Database\DatabaseTable ;
 
 /**
  * Description of SqlQueryBuilder

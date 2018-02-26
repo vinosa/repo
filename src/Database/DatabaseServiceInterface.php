@@ -17,14 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
+namespace Vinosa\Repo\Database;
 
 /**
- * Description of DatabaseException
  *
  * @author vinogradov
  */
-class DatabaseException extends \Exception
+interface DatabaseServiceInterface
 {
-    //put your code here
+    public function fetchRows( $sql ) ;
+    
+    public function getRow( $sql ) ;
+    
+    public function getDatabaseName() ;
+    
+    public function execute( $sql ) ;
+    
+    public function quote( $str );
 }
