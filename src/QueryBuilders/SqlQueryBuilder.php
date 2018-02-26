@@ -38,7 +38,9 @@ class SqlQueryBuilder extends AbstractQueryBuilder
     
     public function __construct(DatabaseRepository $repository)
     {
-        parent::__construct( $repository );
+        $this->repository = $repository ;
+        
+        $this->whereClause = new SqlWhereClause( $this ) ;
         
     }
     
@@ -82,12 +84,7 @@ class SqlQueryBuilder extends AbstractQueryBuilder
         return $this ;
     }
     
-    
-    public function subquery()
-    {
-        return new self( $this->getRepository() ) ;
-    }
-    
+       
     public function getDatabaseName()
     {
         return $this->repository->getDatabaseName() ;

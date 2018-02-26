@@ -118,43 +118,6 @@ class WhereClause
         return $this ;
     }
     
-    public function whereNotNull( $col )
-    {
-        if( $this->isSql() ){
-            
-            $value = " NOT NULL " ;
-            
-            $operator = " IS " ;
-            
-        } 
-        
-        if( $this->isSolr() ){
-            
-            $value = "[* TO *]" ;
-            
-            $operator = ":" ;
-            
-        } 
-              
-        return $this->whereSafe($col, $value, $operator) ; 
-        
-    }
-    
-    public function whereNull( $col )
-    {
-        if( $this->isSql() ){
-            
-            $value = " NULL " ;
-            
-            $operator = " IS " ;
-            
-        } 
-        // todo solr  
-        
-        return $this->whereSafe($col, $value, $operator) ; 
-        
-    }
-    
     public function andWhere($col, $val = null, $operator = false)
     {
         
@@ -182,64 +145,8 @@ class WhereClause
         return $this->whereSafe($col, $val, $operator, "OR");
         
     }
-    
-    public function whereNot($col, $val)
-    {
-        if( $this->isSolr() ){
-            
-            return $this->where("!" . $col, $val, ":", "AND");
-            
-        }
-        
-        if( $this->isSql() ){
-            
-            return $this->where($col, $val, "<>", "AND");
-        }
-            
-    }
-    
-    public function whereIn($col, $unsafeValues = [])
-    {
-        $safeValues = array_map( array( $this, "quote" ), $unsafeValues );
-               
-        if( $this->isSolr() ){
-            
-            $safeString = "(". implode( " OR ", $safeValues ) . ")" ; 
-        
-            return $this->whereSafe( $col, $safeString ) ;
-        
-        }
-        
-        if( $this->isSql() ){
-                       
-            $safeString = "(". implode( ",", $safeValues ) . ")" ; 
-            
-            return $this->whereSafe( $col, $safeString, " IN " ) ;
-        }
-    }
        
-    private function operator($operator)
-    {
-        if( is_string($operator) ){
-            
-            return $operator ;
-            
-        }
-        
-        if( $this->isSql() ){
-            
-            return "=" ;
-            
-        }
-        
-        if( $this->isSolr() ){
-            
-            return ":" ;
-            
-        }
-    }
-    
-    private function quote( $var )
+    protected function quote( $var )
     {
         if( $var === null){
             
@@ -249,17 +156,9 @@ class WhereClause
         return $this->builder->quote( $var );
     }
     
-    private function isSql()
-    {
-        return is_a($this->builder, SqlQueryBuilder::class) ;
-    }
     
-    private function isSolr()
-    {
-        return is_a($this->builder, SolrQueryBuilder::class) ;
-    }
     
-    private function addLogicalOperator( $logicalOperator )
+    protected function addLogicalOperator( $logicalOperator )
     {
         if( count($this->wheres) > 0 ){
             
