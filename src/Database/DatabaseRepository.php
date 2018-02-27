@@ -20,6 +20,7 @@ namespace Vinosa\Repo\Database ;
 
 use Vinosa\Repo\QueryInterface ;
 use Vinosa\Repo\RepositoryInterface ;
+use Vinosa\Repo\AbstractRepository ;
 
 
 /**
@@ -27,7 +28,7 @@ use Vinosa\Repo\RepositoryInterface ;
  *
  * @author vinosa
  */
-class DatabaseRepository implements RepositoryInterface
+class DatabaseRepository extends AbstractRepository implements RepositoryInterface
 {
     
     protected $service ;
@@ -41,40 +42,7 @@ class DatabaseRepository implements RepositoryInterface
         
         $this->prototype = $prototype ;
     } 
-    
-    private function createNew( )
-    {
-             
-       if(!is_null($this->prototype)) { 
-           
-            $new = clone $this->prototype ;
-       
-       }
-       else{
-           
-           $new = new $this->class ;
-           
-       }
-       
-       $new->setSource( $this ) ;
-       
-       return $new ;
-             
-    }
-    
-    private function createNewFromRow( $row )
-    {
-        $new = $this->createNew( ) ;
-        
-        foreach($row as $key => $value){
-            
-            $new->__set($key, $value) ;
-        }
-        
-        return $new ;
-    }
-    
-     
+                   
     public function getDatabaseName()
     {
         return $this->service->getDatabaseName() ;
@@ -83,64 +51,40 @@ class DatabaseRepository implements RepositoryInterface
     public function save(DatabaseEntityInterface $entity )
     {     
                 
-        $sql = $entity->query( $this->query() ) 
-                            ->getQueryInsert() ;
-                                           
-            
-        return $this->service->execute( $sql );
+        return $this->service->execute( $entity->query( $this->query() )->getQueryInsert() );
                                                                               
     }
     
     public function update(DatabaseEntityInterface $entity )
     {
                   
-        $sql = $entity->query( $this->query() ) 
-                            ->getQueryUpdate() ;
-                       
-        
-        return $this->service ->execute( $sql );
+        return $this->service ->execute( $entity->query( $this->query() )->getQueryUpdate() );
                                  
     }
     
     public function get(QueryInterface $query )
     {
         
-        $sql = $this->createNew( )
-                       ->query( $query )
-                       ->limit(1)
-                       ->getQuerySelect() ;
-              
-                                                                         
-        return  $this->createNewFromRow( $this->service->getRow( $sql ) ) ;
+        return array_map( [$this, $this->callbackCreateEntity ], $this->service->fetch( $this->createNew()
+                                                                                            ->query($query)
+                                                                                            ->limit(1)
+                                                                                            ->getQuerySelect()
+                                                                                        )
+                        )[0] ;
                     
     }
     
     public function fetch( QueryInterface $query )
     {
-              
-        $sql = $this->createNew( )
-                     ->query( $query )
-                     ->getQuerySelect() ;
-              
-        
-        $rows = $this->service->fetchRows( $sql );
-            
-        $result = [] ;
-            
-        foreach($rows as $row){
-            
-            $result[] = $this->createNewFromRow( $row ) ;
-        }
-                                
-       return $result ;              
+                 
+       return array_map( [$this, $this->callbackCreateEntity ], $this->service->fetch( $this->createNew()->query($query)->getQuerySelect() ) ) ;
+       
     }
     
     public function delete(DatabaseEntityInterface $entity)
     {
-        $sql = $entity->query( $this->query() )
-                        ->getQueryDelete();
-               
-        return $this->service->execute( $sql );
+        
+        return $this->service->execute( $entity->query( $this->query() )->getQueryDelete() );
                
     }
     

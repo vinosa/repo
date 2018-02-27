@@ -21,13 +21,14 @@ namespace Vinosa\Repo\Solr;
 
 use Vinosa\Repo\RepositoryInterface ;
 use Vinosa\Repo\QueryInterface ;
+use Vinosa\Repo\AbstractRepository ;
 
 /**
  * Description of SolrRepository
  *
  * @author vinosa
  */
-class SolrRepository implements RepositoryInterface
+class SolrRepository extends AbstractRepository implements RepositoryInterface
 {
     protected $service ;
     protected $prototype ;
@@ -38,45 +39,18 @@ class SolrRepository implements RepositoryInterface
         $this->service = $service ;
         $this->prototype = $prototype ;
     }
-    
-    
-    
+          
     public function fetch( QueryInterface $query)
     {
-              
-        $query = $this->createNew()
-                      ->query( $query ) ;
-                                                     
-        
-        $result = $this->service->fetch( $query  ) ;
-
-        $entities = [];
-        
-        foreach($result as $doc){
-
-            $entities[] = $this->createNewFromDoc( $doc ) ;
-        }
-
-        return $entities ; 
-        
+                                    
+        return array_map( [$this, $this->callbackCreateEntity], $this->service->fetch( $this->createNew()->query($query) ) ) ;
+      
     }
     
     public function get( QueryInterface $query)
     {
-              
-        $query = $this->createNew()
-                      ->query( $query ) ;
-                                                     
-        
-        $result = $this->service->fetch( $query  ) ;
-
-        
-        foreach($result as $doc){
-
-            $entitiy = $this->createNewFromDoc( $doc ) ;
-            
-            return $entity ; 
-        }
+                                
+        return array_map( [$this, $this->callbackCreateEntity], $this->service->fetch( $this->createNew()->query($query) ) )[0] ;
        
     }
     
@@ -97,35 +71,4 @@ class SolrRepository implements RepositoryInterface
         return $this->service->getHelper() ;
     }
     
-    protected function createNew( )
-    {
-             
-       if(!is_null($this->prototype)) { 
-           
-            $new = clone $this->prototype ;
-       
-       }
-       else{
-           
-           $new = new $this->class ;
-           
-       }
-       
-       $new->setSource( $this ) ;
-       
-       return $new ;
-             
-    }
-    
-    protected function createNewFromDoc( $doc )
-    {
-        $new = $this->createNew( ) ;
-        
-        foreach($doc as $key => $value){
-            
-            $new->__set($key, $value) ;
-        }
-        
-        return $new ;
-    }
 }

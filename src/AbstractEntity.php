@@ -58,7 +58,7 @@ abstract class AbstractEntity
          
          foreach($this->fields as $key => $value){
              
-             $str .= $key . " -> " . $value . "\n" ;
+             $str .= "\t" . $key . ":\t" . $value . "\n" ;
                         
          }
          

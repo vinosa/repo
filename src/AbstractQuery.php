@@ -39,8 +39,6 @@ abstract class AbstractQuery implements QueryInterface
     {
         if( strpos( strtolower($name), "where" ) !== false ){
             
-            //$where = $this->whereClause ;
-            
             call_user_func_array(array( $this->getWhere(), $name), $arguments ) ;
             
         }
@@ -49,7 +47,7 @@ abstract class AbstractQuery implements QueryInterface
             
             array_unshift($arguments, $this) ;
             
-            return call_user_func_array(array( $this->repository, $name), $arguments ) ;
+            return call_user_func_array(array( $this->getRepository(), $name), $arguments ) ;
             
         }
         
@@ -71,7 +69,7 @@ abstract class AbstractQuery implements QueryInterface
         
         if(is_string($fields)){
             
-            $this->fields = array( $fields );
+            $this->fields = explode("," , $fields);
         }
         
         return $this ;

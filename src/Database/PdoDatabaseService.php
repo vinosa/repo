@@ -58,20 +58,13 @@ class PdoDatabaseService implements DatabaseServiceInterface
         
     }
     
-    public function fetchRows( $sql )
+    public function fetch( $sql )
     {
               
         return $this->query( $sql )->fetchAll(\PDO::FETCH_ASSOC) ;
         
     }
-    
-    public function getRow( $sql )
-    {
        
-        return $this->query( $sql )->fetch(\PDO::FETCH_ASSOC) ;
-        
-    }
-    
     public function getDatabaseName()
     {
         return $this->configuration->getDatabaseName() ;

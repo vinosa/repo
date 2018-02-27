@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 vinosa
+ * Copyright (C) 2018 vino
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,27 +20,43 @@
 namespace Vinosa\Repo;
 
 /**
- * Description of LoggableTrait
+ * Description of AbstractRepository
  *
- * @author vinosa
+ * @author vino
  */
-trait LoggableTrait
+abstract class AbstractRepository
 {
-    protected function loggerDebug( $message )
+    protected $callbackCreateEntity = "createNewFromIterable";
+    
+    protected function createNew( )
     {
-        if( !is_null($this->logger) ){
-            
-            $this->logger->debug( "DEBUG from " . get_class($this) . " : " . $message ) ;
-            
-        }
+             
+       if(!is_null($this->prototype)) { 
+           
+            $new = clone $this->prototype ;
+       
+       }
+       else{
+           
+           $new = new $this->class ;
+           
+       }
+       
+       $new->setSource( $this ) ;
+       
+       return $new ;
+             
     }
     
-    protected function loggerError( $message )
+    protected function createNewFromIterable( $var )
     {
-        if( !is_null($this->logger) ){
+        $new = $this->createNew( ) ;
+        
+        foreach($var as $key => $value){
             
-            $this->logger->error( "ERROR from " . get_class($this) . " : " . $message ) ;
-            
+            $new->__set($key, $value) ;
         }
+        
+        return $new ;
     }
 }

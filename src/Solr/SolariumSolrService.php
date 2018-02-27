@@ -72,18 +72,33 @@ class SolariumSolrService implements SolrServiceInterface
 
         $select->setRows( $query->getLimit() );
         
+        $select->setFields( $query->getFields() );
+        
         try{
                                
 			$resultset = $this->getClient()->select( $select );
             
-            $this->loggerDebug( $query->getQuery() . " , LIMIT " . $query->getLimit() . ", " . count($resultset) . " rows, total: " . $resultset->getNumFound()   ) ;
+            $this->loggerDebug( "query: " . $query->getQuery() . 
+                                " , fields: " . implode("," , $query->getFields()) .
+                                " , limit " . $query->getLimit() . 
+                                ", " . count($resultset) . 
+                                " rows, total: " . $resultset->getNumFound()  
+                                ) ;
             
             if( count($resultset) == 0 ){
                 
                 throw new ObjectNotFoundException("") ;
             }
             
-            return $resultset ;
+            $array = [];
+            
+            foreach($resultset as $doc){
+                
+                $array[] = $doc;
+                
+            }
+            
+            return $array ;
             
 		}
 		catch(\Solarium\Exception\HttpException $ex){

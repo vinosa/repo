@@ -25,9 +25,7 @@ namespace Vinosa\Repo\Database;
  */
 interface DatabaseServiceInterface
 {
-    public function fetchRows( $sql ) ;
-    
-    public function getRow( $sql ) ;
+    public function fetch( $sql ) ;
     
     public function getDatabaseName() ;
     
