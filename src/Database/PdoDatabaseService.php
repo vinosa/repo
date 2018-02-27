@@ -22,6 +22,7 @@ namespace Vinosa\Repo\Database;
 use Vinosa\Repo\LoggerInterface ;
 use Vinosa\Repo\ObjectNotFoundException ;
 
+
 /**
  * Description of DatabaseService
  *
@@ -32,6 +33,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     protected $configuration ;
     private $pdo = null;
     private $logger ;
+    use \Vinosa\Repo\LoggableTrait ;
     
     public function __construct(DatabaseConfiguration $configuration, LoggerInterface $logger = null)
     {
@@ -101,7 +103,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
             
             $pdoStatement = $this->getPdo()->query( $sql ) ;
             
-            $this->logSql( $sql );
+            $this->loggerDebug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
             
             if($pdoStatement->rowCount() == 0){
                 
@@ -112,7 +114,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
             
         } catch (\PDOException $ex) {
             
-            $this->logError( $ex->getMessage() );
+            $this->loggerError( $ex->getMessage() );
             
             throw new DatabaseException( $ex->getMessage() );
             
@@ -120,21 +122,5 @@ class PdoDatabaseService implements DatabaseServiceInterface
         
     }
     
-    private function logSql($sql)
-    {
-        if(!is_null($this->logger)){
-            
-            $this->logger->debug( $sql ) ;
-            
-        }
-    }
     
-    private function logError($message)
-    {
-        if(!is_null($this->logger)){
-            
-            $this->logger->error( $message ) ;
-            
-        }
-    }
 }

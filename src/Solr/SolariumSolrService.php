@@ -31,6 +31,7 @@ class SolariumSolrService implements SolrServiceInterface
     private $configuration;
     private $client = null ;
     private $logger ;
+    use \Vinosa\Repo\LoggableTrait ;
     
     public function __construct(SolrConfiguration $configuration, LoggerInterface $logger = null)
     {
@@ -72,10 +73,12 @@ class SolariumSolrService implements SolrServiceInterface
         $select->setRows( $query->getLimit() );
         
         try{
-            
+                               
 			$resultset = $this->getClient()->select( $select );
             
-            if($resultset->getNumFound() == 0){
+            $this->loggerDebug( $query->getQuery() . " , LIMIT " . $query->getLimit() . ", " . count($resultset) . " rows, total: " . $resultset->getNumFound()   ) ;
+            
+            if( count($resultset) == 0 ){
                 
                 throw new ObjectNotFoundException("") ;
             }
@@ -85,7 +88,7 @@ class SolariumSolrService implements SolrServiceInterface
 		}
 		catch(\Solarium\Exception\HttpException $ex){
             
-			$this->logError( $ex->getMessage() ) ;
+			$this->loggerError( $ex->getMessage() ) ;
             
             throw new SolrException( $ex->getMessage() );
 
