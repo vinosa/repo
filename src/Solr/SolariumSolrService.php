@@ -114,18 +114,10 @@ class SolariumSolrService implements SolrServiceInterface
     {
         if(is_null($this->client)){
             
-            throw new SolrException("Solr service was not started!") ;
+            throw new SolrException("Missing statement: " . get_class($this) . "::init()" ) ;
         }
         
         return $this->client ;
     }
     
-    private function logError($message)
-    {
-        if(!is_null($this->logger)){
-            
-            $this->logger->error( $message ) ;
-            
-        }
-    }
 }

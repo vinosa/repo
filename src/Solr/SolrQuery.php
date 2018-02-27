@@ -67,18 +67,6 @@ class SolrQuery extends AbstractQuery
         return "[" . $this->formatDate( $start ) . " TO " . $this->formatDate($end) . "]" ;
     }
     
-        
-    private function escapePhrase($input)
-    {
-                
-        return $this->getHelper()->escapePhrase($input);
-        
-    }
-    
-    private function escapeTerm($input)
-    {
-        return $this->getHelper()->escapeTerm($input);
-    }
        
     private function getHelper()
     {

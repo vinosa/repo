@@ -84,7 +84,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     {
         if(is_null($this->pdo)){
             
-            throw new DatabaseException("PDO was not started");
+            throw new DatabaseException("Missing statement: " . get_class($this) . "::init()");
         }
         
         return $this->pdo;
