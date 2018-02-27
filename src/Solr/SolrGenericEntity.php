@@ -27,7 +27,7 @@ use Vinosa\Repo\AbstractEntity ;
  *
  * @author vinosa
  */
-class SolrGenericEntity extends AbstractEntity
+class SolrGenericEntity extends AbstractEntity implements SolrEntityInterface
 {
     public function query(SolrQuery $query)
     {

@@ -17,37 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
+namespace Vinosa\Repo\Solr;
 
 /**
- * Description of AbstractRepository
  *
  * @author vino
  */
-abstract class AbstractRepository
+interface SolrEntityInterface
 {
-    protected $callbackCreateEntity = "createNewFromIterable";
-    
-    protected function createNew( )
-    {
-             
-        $new = clone $this->prototype ;
-       
-        $new->setSource( $this ) ;
-       
-        return $new ;
-             
-    }
-    
-    protected function createNewFromIterable( $var )
-    {
-        $new = $this->createNew( ) ;
-        
-        foreach($var as $key => $value){
-            
-            $new->__set($key, $value) ;
-        }
-        
-        return $new ;
-    }
+    public function query(SolrQuery $query) ;
 }

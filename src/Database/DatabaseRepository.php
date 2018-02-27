@@ -32,15 +32,14 @@ class DatabaseRepository extends AbstractRepository implements RepositoryInterfa
 {
     
     protected $service ;
-    protected $prototype = null ;
-    protected $class = DatabaseGenericEntity::class ;
+    protected $prototype ;
       
-    public function __construct(DatabaseServiceInterface $service, $prototype = null )
+    public function __construct(DatabaseServiceInterface $service, DatabaseEntityInterface $entityPrototype )
     {
         
         $this->service = $service;
         
-        $this->prototype = $prototype ;
+        $this->prototype = $entityPrototype ;
     } 
                    
     public function getDatabaseName()

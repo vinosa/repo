@@ -79,4 +79,24 @@ class DatabaseGenericEntity extends AbstractEntity implements DatabaseEntityInte
                
         return $query ;
     }
+    
+    public function save()
+    {
+        return $this->getSource()->save( $this );
+    }
+    
+    public function update()
+    {
+        return $this->getSource()->update( $this );
+    }
+    
+    public function delete()
+    {
+        return $this->getSource()->delete( $this );
+    }
+    
+    private function getSource()
+    {
+        return $this->source ;
+    }
 }

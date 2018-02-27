@@ -32,12 +32,11 @@ class SolrRepository extends AbstractRepository implements RepositoryInterface
 {
     protected $service ;
     protected $prototype ;
-    protected $class = SolrGenericEntity::class ;
     
-    public function __construct(SolrServiceInterface $service, $prototype = null)
+    public function __construct(SolrServiceInterface $service, SolrEntityInterface $entityPrototype )
     {
         $this->service = $service ;
-        $this->prototype = $prototype ;
+        $this->prototype = $entityPrototype ;
     }
           
     public function fetch( QueryInterface $query)

@@ -35,4 +35,10 @@ interface DatabaseEntityInterface
     public function query(SqlQuery $query) ;
     
     public function setSource(RepositoryInterface $source) ;
+    
+    public function save();
+    
+    public function update();
+    
+    public function delete();
 }
