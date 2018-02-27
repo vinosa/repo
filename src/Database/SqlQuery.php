@@ -101,7 +101,7 @@ class SqlQuery extends AbstractQuery
         
         try{
             
-            $q .= " WHERE " . $this->whereClause->output();           
+            $q .= " WHERE " . $this->getWhere()->output();           
             
         } catch (QueryException $ex) {
 
@@ -132,7 +132,7 @@ class SqlQuery extends AbstractQuery
            
         $q .= implode(", ", $this->update) ;
         
-        $q .= " WHERE " . $this->whereClause->output() ;
+        $q .= " WHERE " . $this->getWhere()->output() ;
         
         return $q ;
     }
@@ -141,7 +141,7 @@ class SqlQuery extends AbstractQuery
     {
         $q = "DELETE FROM " . $this->getTableStr() ;  
         
-        $q .= " WHERE " . $this->whereClause->output() ;
+        $q .= " WHERE " . $this->getWhere()->output() ;
         
         return $q ;
     }
@@ -152,7 +152,7 @@ class SqlQuery extends AbstractQuery
         
         try{
             
-            $q .= " WHERE " . $this->whereClause->output();           
+            $q .= " WHERE " . $this->getWhere()->output();           
             
         } catch (QueryException $ex) {
 

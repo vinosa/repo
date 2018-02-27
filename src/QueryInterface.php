@@ -34,5 +34,5 @@ interface QueryInterface
     
     public function select($fields) ;
     
-    public function getClause() ;
+    //public function getClause() ;
 }

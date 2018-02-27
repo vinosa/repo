@@ -26,7 +26,7 @@ namespace Vinosa\Repo ;
  *
  * @author vinosa
  */
-class AbstractWhereClause
+abstract class AbstractWhereClause
 {
 
     private $wheres = [];
@@ -54,7 +54,7 @@ class AbstractWhereClause
     
     public function __toString()
     {
-       
+               
         $str = "";
         
         foreach($this->wheres as $where){

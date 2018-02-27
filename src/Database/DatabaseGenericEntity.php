@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 vinogradov
+ * Copyright (C) 2018 vinosa
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,56 +20,16 @@
 namespace Vinosa\Repo\Database;
 
 
-use Vinosa\Repo\RepositoryInterface ;
 use Vinosa\Repo\EmptyFieldException ;
+use Vinosa\Repo\AbstractEntity ;
 
 /**
  * Description of DatabaseGenericEntity
  *
- * @author vinogradov
+ * @author vinosa
  */
-class DatabaseGenericEntity implements DatabaseEntityInterface
+class DatabaseGenericEntity extends AbstractEntity implements DatabaseEntityInterface
 {
-    protected $fields = [];
-    protected $source = null ;
-       
-    public function __set($name, $value)
-    {
-        
-        $this->fields[$name] = $value ;
-    }
-    
-    public function __get( $name )
-    {
-              
-        if( isset($this->fields[$name]) ){
-            
-            return $this->fields[$name] ;
-        } 
-        
-        throw new EmptyFieldException ("unset field " . $name . " " . $this  ) ;
-        
-    }
-    
-    public function setSource(RepositoryInterface $source)
-    {
-        $this->source = $source ;
-    }
-    
-    public function __toString()
-    {
-         $str = get_class( $this ) . " :\n" ;
-         
-         foreach($this->fields as $key => $value){
-             
-             $str .= $key . " -> " . $value . "\n" ;
-                        
-         }
-         
-         $str .= "\n" ;
-         
-         return $str ;
-    }
     
     public function query(SqlQuery $query)
     {

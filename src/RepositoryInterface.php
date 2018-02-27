@@ -31,7 +31,7 @@ interface RepositoryInterface
     
     public function query() ;
     
-    public function get(  QueryInterface $builder ) ;
+    public function get(  QueryInterface $query ) ;
     
-    public function fetch(  QueryInterface $builder ) ;
+    public function fetch(  QueryInterface $query ) ;
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 vinogradov
+ * Copyright (C) 2018 vinosa
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ namespace Vinosa\Repo\Database;
 
 /**
  *
- * @author vinogradov
+ * @author vinosa
  */
 interface DatabaseServiceInterface
 {

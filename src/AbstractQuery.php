@@ -39,9 +39,9 @@ abstract class AbstractQuery implements QueryInterface
     {
         if( strpos( strtolower($name), "where" ) !== false ){
             
-            $where = $this->whereClause ;
+            //$where = $this->whereClause ;
             
-            call_user_func_array(array( $where, $name), $arguments ) ;
+            call_user_func_array(array( $this->getWhere(), $name), $arguments ) ;
             
         }
         
@@ -130,10 +130,12 @@ abstract class AbstractQuery implements QueryInterface
         
     }
     
-    public function getClause()
+    protected function getWhere()
     {
         return $this->whereClause ;
     }
+    
+    
     
         
 }
