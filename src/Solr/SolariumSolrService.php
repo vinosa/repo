@@ -33,7 +33,7 @@ class SolariumSolrService implements SolrServiceInterface
     private $logger ;
     use \Vinosa\Repo\LoggableTrait ;
     
-    public function __construct(SolrConfiguration $configuration, LoggerInterface $logger = null)
+    public function __construct(SolariumConfiguration $configuration, LoggerInterface $logger = null)
     {
         $this->configuration = $configuration;
         
