@@ -19,6 +19,8 @@
 
 namespace Vinosa\Repo;
 
+use Vinosa\Repo\Reflection\EntityDefinition ;
+
 /**
  * Description of AbstractGenericEntity
  *
@@ -31,6 +33,11 @@ abstract class AbstractEntity
        
     public function __set($name, $value)
     {
+        
+        if( $this->definition()->property($name)->readonly() ){
+            
+            return ;
+        }
         
         $this->fields[$name] = $value ;
     }
@@ -65,5 +72,21 @@ abstract class AbstractEntity
          $str .= "\n" ;
          
          return $str ;
+    }
+    
+    public function withData($data)
+    {
+        foreach($data as $key => $value){
+            
+            $this->fields[$key] = $value ;
+            
+        }
+        
+        return $this ;
+    }
+    
+    protected function definition()
+    {
+        return new EntityDefinition( get_class($this) ) ;
     }
 }

@@ -34,9 +34,8 @@ class SqlQuery extends AbstractQuery
     public $insert = [];
     public $update = [];
     protected $join = "" ;
-    protected $tables = [] ;
-    
-    
+    protected $from ;
+        
     public function __construct(DatabaseRepository $repository)
     {
         $this->repository = $repository ;
@@ -44,36 +43,25 @@ class SqlQuery extends AbstractQuery
         $this->whereClause = new SqlWhereClause( $this ) ;
         
     }
-    
-     public function from(DatabaseTable $table)
+      
+    public function from( $table )
     {
-                    
-        if( !in_array( $this->checkDatabaseName( $table ), $this->tables ) ){
-            
-            $this->tables[] = $table ;
-            
-        }
+        $this->from = $table ;
         
         return $this ;
     }
     
-    public function flushTables()
+    
+    public function join($table)
     {
-        $this->tables = [];
+        $this->join .= " JOIN " . $table ;
         
         return $this ;
     }
     
-    public function join(DatabaseTable $table)
+    public function leftOuterJoin($table)
     {
-        $this->join .= " JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
-        
-        return $this ;
-    }
-    
-    public function leftOuterJoin(DatabaseTable $table)
-    {
-        $this->join .= " LEFT OUTER JOIN " . (string) $this->checkDatabaseName( $table ) . $table->getAliasString() ;
+        $this->join .= " LEFT OUTER JOIN " . $table  ;
         
         return $this ;
     }
@@ -95,9 +83,9 @@ class SqlQuery extends AbstractQuery
     public function getQuerySelect()
     {
                           
-        $q = "SELECT " . $this->getSelect() . 
+        $q = "SELECT " . implode("," , $this->fields) . 
                    
-         " FROM " . $this->getFrom() ;
+         " FROM " . $this->from . " " . $this->join ;
         
         try{
             
@@ -116,7 +104,7 @@ class SqlQuery extends AbstractQuery
     public function getQueryInsert()
     {
              
-        return "INSERT INTO " . $this->getTableStr() .  
+        return "INSERT INTO " . $this->from .  
             
                 " (" . implode(", " , array_keys( $this->insert) ) . ") " .
             
@@ -128,7 +116,7 @@ class SqlQuery extends AbstractQuery
     public function getQueryUpdate()
     {
           
-        $q = "UPDATE " . $this->getTableStr() . " SET ";
+        $q = "UPDATE " . $this->from . " SET ";
            
         $q .= implode(", ", $this->update) ;
         
@@ -139,7 +127,7 @@ class SqlQuery extends AbstractQuery
     
     public function getQueryDelete()
     {
-        $q = "DELETE FROM " . $this->getTableStr() ;  
+        $q = "DELETE FROM " . $this->from ;  
         
         $q .= " WHERE " . $this->getWhere()->output() ;
         
@@ -148,7 +136,7 @@ class SqlQuery extends AbstractQuery
     
     public function getQueryCount()
     {
-        $q = "SELECT count(*) FROM " . $this->getFrom() ;  
+        $q = "SELECT count(*) FROM " . $this->from ;  
         
         try{
             
@@ -166,69 +154,5 @@ class SqlQuery extends AbstractQuery
         $this->repository->updateField($this, $field, $value );
     }
     
-    private function getFrom()
-    {
-        $from = [] ;
-        
-        foreach($this->getTables() as $table){
-            
-            $from[] = (string) $table . $table->getAliasString() ;
-        }
-        
-        $str = implode(", " , $from ) ;
-        
-        $str .= $this->join ;
-                
-        return $str ;
-        
-    }
-    
-    private function checkDatabaseName(DatabaseTable $table)
-    {
-        if( empty($table->getDatabaseName() ) ){
-            
-            $table->setDatabaseName( $this->getDatabaseName() ) ;
-            
-        }
-        
-        return $table ;
-    }
-    
-    protected function getSelect()
-    {
-        $str = $this->getTableStr() . ".*" ;
-        
-        if( count( $this->getFields() ) > 0 ){
-            
-            $str = implode(", " , $this->getFields() );
-            
-        }
-        
-        return $str ;
-    }
-    
-    protected function getTable()
-    {
-       
-        if( count($this->tables) == 0 ){
-            
-            throw new QueryException( "Empty Table " . print_r($this,true) );
-            
-        }
-        
-        return $this->tables[0] ;
-    }
-    
-    protected function getTableStr()
-    {
-        
-        return (string) $this->checkDatabaseName( $this->getTable() ) ;
-        
-    }
-    
-    protected function getTables()
-    {
-        return $this->tables ;
-    }
-        
+   
 }

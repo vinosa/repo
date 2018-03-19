@@ -30,7 +30,7 @@ use Vinosa\Repo\AbstractEntity ;
  */
 class DatabaseGenericEntity extends AbstractEntity implements DatabaseEntityInterface
 {
-    
+    /*
     public function query(SqlQuery $query)
     {
         if(!method_exists($this, "getTable")){
@@ -42,7 +42,9 @@ class DatabaseGenericEntity extends AbstractEntity implements DatabaseEntityInte
         $table = $this->getTable() ;
                              
         $query = $query->flushTables()
-                       ->from( $this->getTable() ) ;
+                       ->from( $table )
+                       ->select( $table->getFields() ) ;
+                        
                                
         foreach($table->getWriteableFields() as  $key ){
             
@@ -78,25 +80,73 @@ class DatabaseGenericEntity extends AbstractEntity implements DatabaseEntityInte
         }
                
         return $query ;
+    } */
+    
+    public function query(SqlQuery $query)
+    {
+        $definition = $this->definition() ;
+        
+        $properties = $definition->properties() ;
+        
+        $query = $query->from($definition->table() )
+                        ->select( array_map(  function($property) {return $property->name(); }, $properties ) )
+                        ;
+                        
+        foreach($properties as $property){
+                           
+            $key = $property->name() ;
+                
+            try{
+                    
+                $value = $query->quote( $this->__get($key) ) ;
+                
+                $query->insert["`{$key}`"] = $value ; 
+                
+                $query->update["`{$key}`"] =  "`{$key}`=" . $value;
+                    
+            } catch (EmptyFieldException $ex) {
+
+            }
+                          
+        }
+        
+        foreach($definition->keys() as $key){
+            
+            try{
+                
+                $query = $query->where( $key, $this->__get($key) );
+                
+            } catch (EmptyFieldException $ex) {
+
+            }
+            
+        }
+        
+        return $query ;
     }
     
-    public function save()
+    public function persist()
     {
-        return $this->getSource()->save( $this );
+        return $this->source()->persist( $this );
     }
     
     public function update()
     {
-        return $this->getSource()->update( $this );
+        return $this->source()->update( $this );
     }
     
     public function delete()
     {
-        return $this->getSource()->delete( $this );
+        return $this->source()->delete( $this );
     }
     
-    private function getSource()
+    private function source()
     {
         return $this->source ;
+    }
+    
+    protected function definition()
+    {
+        return new DatabaseEntityDefinition( get_class($this) ) ;
     }
 }

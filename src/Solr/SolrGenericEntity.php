@@ -31,6 +31,20 @@ class SolrGenericEntity extends AbstractEntity implements SolrEntityInterface
 {
     public function query(SolrQuery $query)
     {
+        $definition = $this->definition() ;
+        
+        $query = $query->select( array_map(function($property) {return $property->name(); },
+                                        $definition->properties() )
+                             );
+        
+        
+        foreach($definition->conditions() as $condition){
+            
+            $query = $query->where( $condition ) ;
+        }
+
         return $query ;
     }
+    
+    
 }

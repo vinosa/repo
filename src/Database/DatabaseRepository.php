@@ -47,9 +47,9 @@ class DatabaseRepository extends AbstractRepository implements RepositoryInterfa
         return $this->service->getDatabaseName() ;
     }
        
-    public function save(DatabaseEntityInterface $entity )
+    public function persist(DatabaseEntityInterface $entity )
     {     
-                
+        //die( $entity->query( $this->query() )->getQueryInsert() )   ;     
         return $this->service->execute( $entity->query( $this->query() )->getQueryInsert() );
                                                                               
     }

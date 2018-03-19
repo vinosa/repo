@@ -41,13 +41,7 @@ abstract class AbstractRepository
     
     protected function createNewFromIterable( $var )
     {
-        $new = $this->createNew( ) ;
-        
-        foreach($var as $key => $value){
-            
-            $new->__set($key, $value) ;
-        }
-        
-        return $new ;
+       
+        return $this->createNew( )->withData( $var ) ;
     }
 }

@@ -36,7 +36,7 @@ interface DatabaseEntityInterface
     
     public function setSource(RepositoryInterface $source) ;
     
-    public function save();
+    public function persist();
     
     public function update();
     

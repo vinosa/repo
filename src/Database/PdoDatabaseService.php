@@ -72,7 +72,21 @@ class PdoDatabaseService implements DatabaseServiceInterface
     
     public function execute( $sql )
     {
-        return $this->query($sql) ;
+        try{
+           
+            $pdoStatement = $this->getPdo()->query( $sql ) ;
+            
+            $this->loggerDebug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
+                        
+            return $pdoStatement ;
+            
+        } catch (\PDOException $ex) {
+            
+            $this->loggerError( $ex->getMessage() );
+            
+            throw new DatabaseException( $ex->getMessage() );
+            
+        }
     }
     
     public function quote( $str)
@@ -93,7 +107,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
     private function query( $sql )
     {
         try{
-            
+           
             $pdoStatement = $this->getPdo()->query( $sql ) ;
             
             $this->loggerDebug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
