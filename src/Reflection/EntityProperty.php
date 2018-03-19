@@ -1,0 +1,56 @@
+<?php
+
+/*
+ * Copyright (C) 2018 vino
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace Vinosa\Repo\Reflection;
+
+
+/**
+ * Description of EntityProperty
+ *
+ * @author vino
+ */
+class EntityProperty
+{
+    private $name;
+    private $readonly;
+      
+    public function withDocCommentLine(DocCommentLine $line)
+    {
+        
+        if( !$line->isProperty() ){
+            
+            throw new DocCommentException();
+        }
+        
+        $this->name = $line->propertyName() ;
+        $this->readonly = $line->isReadonly() ;
+        
+        return $this ;
+    }
+    
+    public function name()
+    {
+        return $this->name ;
+    }
+    
+    public function readonly()
+    {
+        return $this->readonly ;
+    }
+}
