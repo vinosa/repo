@@ -77,7 +77,13 @@ abstract class AbstractWhereClause
     
     public function where($col, $value = null, $operator = false, $logical = "AND" )
     {
-              
+        if(is_null($value) && is_string($col))  {
+            
+            $this->wheres[] = $col ;
+            
+            return $this;
+        }  
+        
         return $this->whereSafe($col, $this->quote( $value ), $operator, $logical) ; 
         
     }
