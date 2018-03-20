@@ -19,7 +19,7 @@
 
 namespace Vinosa\Repo\Database;
 
-use Vinosa\Repo\LoggerInterface ;
+use Psr\Log\LoggerInterface ;
 use Vinosa\Repo\ObjectNotFoundException ;
 
 
