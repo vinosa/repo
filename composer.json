@@ -7,10 +7,13 @@
             "email": "alex.and.re@mail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "solarium/solarium": "4.0.0-alpha.1"
+    },
     "autoload": {
         "psr-4": {
             "Vinosa\\Repo\\":        "src"
         }
-    }
+    },
+    "version" : "1.0.1"
 }
