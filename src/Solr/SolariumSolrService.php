@@ -21,6 +21,8 @@ namespace Vinosa\Repo\Solr;
 
 use Psr\Log\LoggerInterface ;
 use Vinosa\Repo\ObjectNotFoundException ;
+use Solarium\Client ;
+use Vinosa\Repo\QueryException ;
 /**
  * Description of SolariumSolrService
  *
@@ -33,24 +35,14 @@ class SolariumSolrService implements SolrServiceInterface
     private $logger ;
     use \Vinosa\Repo\LoggableTrait ;
     
-    public function __construct(SolariumConfiguration $configuration, LoggerInterface $logger = null)
+    public function __construct(Client $client, LoggerInterface $logger = null)
     {
-        $this->configuration = $configuration;
+        
+        $this->client = $client ;
         
         $this->logger = $logger ;
     }
-    
-    public function init()
-    {
         
-        $this->client = new \Solarium\Client( $this->configuration->getConfigurationArray() ) ;
-        
-        //$this->client->setDefaultEndpoint( $this->configuration->getCore() ) ;
-        
-        //$this->client->setAdapter('Solarium\Core\Client\Adapter\Curl');
-
-    }
-    
     public function quote( $input )
     {
         $query = $this->getClient()->createSelect();
@@ -73,6 +65,14 @@ class SolariumSolrService implements SolrServiceInterface
         $select->setRows( $query->getLimit() );
         
         $select->setFields( $query->getFields() );
+       
+        try{
+            
+            $this->client->setDefaultEndpoint( $query->core() ) ;
+            
+        } catch (QueryException $ex) {
+
+        }
         
         try{
                                

@@ -20,6 +20,7 @@
 namespace Vinosa\Repo\Solr;
 
 use Vinosa\Repo\AbstractEntity ;
+use Vinosa\Repo\Reflection\EntityException ;
 
 
 /**
@@ -42,8 +43,21 @@ class SolrGenericEntity extends AbstractEntity implements SolrEntityInterface
             
             $query = $query->where( $condition ) ;
         }
+        
+        try{
+            
+            $query->setCore($definition->core()) ;
+            
+        } catch (EntityException $ex) {
 
+        }
+        
         return $query ;
+    }
+    
+    protected function definition()
+    {
+        return new SolrEntityDefinition( get_class($this) ) ;
     }
     
     

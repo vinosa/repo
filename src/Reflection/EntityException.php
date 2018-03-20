@@ -17,26 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Solr;
-
-use Vinosa\Repo\AbstractConfiguration ;
+namespace Vinosa\Repo\Reflection;
 
 /**
- * Description of SolariumConfiguration
+ * Description of EntityException
  *
  * @author vino
  */
-class SolariumConfiguration
+class EntityException extends \Exception
 {
-    private $config = [] ;
-    
-    public function provide()
-    {
-        return $this->config ;
-    }
-    
-    public function load($config = [])
-    {
-        $this->config = $config ;
-    }
+    //put your code here
 }

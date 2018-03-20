@@ -20,7 +20,7 @@
 namespace Vinosa\Repo\Solr;
 
 use Vinosa\Repo\AbstractQuery ;
-
+use Vinosa\Repo\QueryException ;
 /**
  * Description of SolrQuery
  *
@@ -30,6 +30,7 @@ class SolrQuery extends AbstractQuery
 {
     //protected $where ;
     protected $repository;
+    protected $core = null ;
     
     public function __construct(SolrRepository $repository)
     {
@@ -67,6 +68,21 @@ class SolrQuery extends AbstractQuery
         return "[" . $this->formatDate( $start ) . " TO " . $this->formatDate($end) . "]" ;
     }
     
+    public function setCore($core)
+    {
+       
+        $this->core = $core;
+    }
+    
+    public function core()
+    {
+         if(is_null($this->core) ){
+             
+             throw new QueryException("core is not defined") ;
+        }
+         
+        return $this->core ;
+    }
        
     private function getHelper()
     {

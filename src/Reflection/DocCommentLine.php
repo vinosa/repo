@@ -55,6 +55,18 @@ class DocCommentLine
         return $this->tokenStartingWith("@key") !== false ;
     }
     
+    public function isCore()
+    {
+        return $this->tokenStartingWith("@core") !== false ;
+    }
+    
+    public function core()
+    {
+        
+        return $this->nextTokenAfter("@core") ;
+               
+    }
+    
     public function condition()
     {
         
