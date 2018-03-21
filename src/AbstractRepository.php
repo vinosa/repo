@@ -19,6 +19,9 @@
 
 namespace Vinosa\Repo;
 
+use Vinosa\Repo\Reflection\EntityCollectionDefinition ;
+use Vinosa\Repo\Reflection\DocCommentException ;
+
 /**
  * Description of AbstractRepository
  *
@@ -27,12 +30,25 @@ namespace Vinosa\Repo;
 abstract class AbstractRepository
 {
     protected $callbackCreateEntity = "createNewFromIterable";
+    protected $prototype = null ;
+    
+    public function __construct($entityPrototype = null)
+    {
+        $this->prototype = $entityPrototype ;
+    }
     
     protected function createNew( )
     {
-             
-        $new = clone $this->prototype ;
-       
+        if( !is_null($this->prototype) ){
+            
+            $new = clone $this->prototype ;
+        }
+        else{
+            
+            $new = ( new EntityCollectionDefinition( get_class($this) ) )->createNewEntity() ;
+            
+        }        
+                    
         $new->setSource( $this ) ;
        
         return $new ;

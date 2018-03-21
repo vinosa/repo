@@ -76,13 +76,13 @@ class PdoDatabaseService implements DatabaseServiceInterface
            
             $pdoStatement = $this->getPdo()->query( $sql ) ;
             
-            $this->loggerDebug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
+            $this->debug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
                         
             return $pdoStatement ;
             
         } catch (\PDOException $ex) {
             
-            $this->loggerError( $ex->getMessage() );
+            $this->error( $ex->getMessage() );
             
             throw new DatabaseException( $ex->getMessage() );
             
@@ -110,7 +110,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
            
             $pdoStatement = $this->getPdo()->query( $sql ) ;
             
-            $this->loggerDebug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
+            $this->debug( $sql . " (" . $pdoStatement->rowCount() . " rows)" );
             
             if($pdoStatement->rowCount() == 0){
                 
@@ -121,7 +121,7 @@ class PdoDatabaseService implements DatabaseServiceInterface
             
         } catch (\PDOException $ex) {
             
-            $this->loggerError( $ex->getMessage() );
+            $this->error( $ex->getMessage() );
             
             throw new DatabaseException( $ex->getMessage() );
             

@@ -17,38 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo\Database;
-
-use Vinosa\Repo\Reflection\EntityDefinition ;
-use Vinosa\Repo\Reflection\DocCommentLine ;
+namespace Vinosa\Repo;
 
 /**
- * Description of DatabaseEntityDefinition
+ * Description of ModelException
  *
  * @author vino
  */
-class DatabaseEntityDefinition extends EntityDefinition
+class ModelException extends \Exception
 {
-    protected $table ;
-    protected $keys = [] ;
-    
-    public function __construct($class)
-    {
-        parent::__construct($class);
-        
-        $this->table = $this->docComment->getEntityTable();
-        
-        $this->keys = $this->docComment->getEntityKeys() ;
-        
-    }
-    
-    public function table()
-    {
-        return $this->table ;
-    }
-    
-    public function keys()
-    {
-        return $this->keys ;
-    }
+    //put your code here
 }

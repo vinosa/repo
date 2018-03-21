@@ -26,7 +26,7 @@ namespace Vinosa\Repo;
  */
 trait LoggableTrait
 {
-    protected function loggerDebug( $message )
+    protected function debug( $message )
     {
         if( !is_null($this->logger) ){
             
@@ -35,7 +35,7 @@ trait LoggableTrait
         }
     }
     
-    protected function loggerError( $message )
+    protected function error( $message )
     {
         if( !is_null($this->logger) ){
             

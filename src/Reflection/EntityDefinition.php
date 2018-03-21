@@ -27,32 +27,18 @@ namespace Vinosa\Repo\Reflection;
  */
 class EntityDefinition
 {
+    protected $docComment ;
     protected $properties = [];
     protected $conditions = [] ;
     
     public function __construct( $class )
     {
+        $this->docComment = new DocComment( $class ) ;
+        
+        $this->properties = $this->docComment->getEntityProperies() ;
+        
+        $this->conditions = $this->docComment->getEntityConditions() ;
                
-        $lines = array_map( function($line) {return new DocCommentLine( $line) ; },
-                            explode("\n", (new \ReflectionClass($class) )->getDocComment() )
-                          );
-        
-        foreach($lines as $line){
-            
-            try{
-                
-                $this->properties[] = (new EntityProperty() )->withDocCommentLine( $line ) ;
-                
-            } catch (DocCommentException $ex) {
-
-            }
-            
-            if ( $line->isCondition() ){
-                
-                $this->conditions[] = $line->condition() ;
-            }
-        }
-        
     }
     
     public function properties()

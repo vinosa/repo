@@ -60,10 +60,22 @@ class DocCommentLine
         return $this->tokenStartingWith("@core") !== false ;
     }
     
+    public function isEntity()
+    {
+        return $this->tokenStartingWith("@entity") !== false ;
+    }
+    
     public function core()
     {
         
         return $this->nextTokenAfter("@core") ;
+               
+    }
+    
+    public function entity()
+    {
+        
+        return $this->nextTokenAfter("@entity") ;
                
     }
     

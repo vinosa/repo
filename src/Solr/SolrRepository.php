@@ -31,12 +31,12 @@ use Vinosa\Repo\AbstractRepository ;
 class SolrRepository extends AbstractRepository implements RepositoryInterface
 {
     protected $service ;
-    protected $prototype ;
-    
-    public function __construct(SolrServiceInterface $service, SolrEntityInterface $entityPrototype )
+        
+    public function __construct(SolrServiceInterface $service, SolrEntityInterface $entityPrototype = null )
     {
         $this->service = $service ;
-        $this->prototype = $entityPrototype ;
+        
+        parent::__construct($entityPrototype);
     }
           
     public function fetch( QueryInterface $query)

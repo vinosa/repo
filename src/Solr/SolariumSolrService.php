@@ -30,7 +30,7 @@ use Vinosa\Repo\QueryException ;
  */
 class SolariumSolrService implements SolrServiceInterface
 {
-    private $configuration;
+    
     private $client = null ;
     private $logger ;
     use \Vinosa\Repo\LoggableTrait ;
@@ -78,7 +78,7 @@ class SolariumSolrService implements SolrServiceInterface
                                
 			$resultset = $this->getClient()->select( $select );
             
-            $this->loggerDebug( "query: " . $query->getQuery() . 
+            $this->debug( "query: " . $query->getQuery() . 
                                 " , fields: " . implode("," , $query->getFields()) .
                                 " , limit " . $query->getLimit() . 
                                 ", " . count($resultset) . 
@@ -103,7 +103,7 @@ class SolariumSolrService implements SolrServiceInterface
 		}
 		catch(\Solarium\Exception\HttpException $ex){
             
-			$this->loggerError( $ex->getMessage() ) ;
+			$this->error( $ex->getMessage() ) ;
             
             throw new SolrException( $ex->getMessage() );
 

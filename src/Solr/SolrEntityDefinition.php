@@ -36,18 +36,8 @@ class SolrEntityDefinition extends EntityDefinition
     {
         parent::__construct($class);
         
-        $lines = array_map( function($line) {return new DocCommentLine( $line) ; },
-                            explode("\n", (new \ReflectionClass($class) )->getDocComment() )
-                          );
+        $this->core = $this->docComment->getEntityCore() ;
         
-        foreach($lines as $line){
-            
-            if( $line->isCore() ){
-                
-                $this->core = $line->core() ;
-                
-            }
-        }
     }
     
     public function core()

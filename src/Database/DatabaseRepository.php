@@ -32,14 +32,15 @@ class DatabaseRepository extends AbstractRepository implements RepositoryInterfa
 {
     
     protected $service ;
-    protected $prototype ;
+    
       
-    public function __construct(DatabaseServiceInterface $service, DatabaseEntityInterface $entityPrototype )
+    public function __construct(DatabaseServiceInterface $service, DatabaseEntityInterface $entityPrototype = null )
     {
         
         $this->service = $service;
         
-        $this->prototype = $entityPrototype ;
+        parent::__construct($entityPrototype);
+
     } 
                    
     public function getDatabaseName()
@@ -49,7 +50,7 @@ class DatabaseRepository extends AbstractRepository implements RepositoryInterfa
        
     public function persist(DatabaseEntityInterface $entity )
     {     
-        //die( $entity->query( $this->query() )->getQueryInsert() )   ;     
+        
         return $this->service->execute( $entity->query( $this->query() )->getQueryInsert() );
                                                                               
     }
