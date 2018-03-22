@@ -50,7 +50,7 @@ abstract class AbstractEntity
             return $this->fields[$name] ;
         } 
         
-        throw new EmptyFieldException ("unset field " . $name . " " . $this  ) ;
+        throw new EmptyFieldException ("unset field " . $name ) ;
         
     }
     
@@ -65,7 +65,11 @@ abstract class AbstractEntity
          
          foreach($this->fields as $key => $value){
              
-             $str .= "\t" . $key . ":\t" . $value . "\n" ;
+             if(is_string($value)){
+                 
+                $str .= "\t" . $key . ":\t" . $value . "\n" ;
+                
+             }
                         
          }
          
