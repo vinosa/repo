@@ -18,97 +18,48 @@
  */
 namespace Vinosa\Repo ;
 
-use Vinosa\Repo\RepositoryInterface ;
 /**
  * Description of AbstractQuery
  *
  * @author vinosa
  */
-abstract class AbstractQuery implements QueryInterface
-{
-    //put your code here
-    protected $repository ;
-       
+class AbstractQuery
+{      
     protected $start = 0;
     protected $limit = 10;
-    protected $whereClause ;
-    protected $fields = array() ;
-       
-    
-    public function __call($name, $arguments)
+    protected $fields = [] ;
+    protected $conditions = [] ;
+    protected $defaultLogic = "AND" ;
+           
+    public function select(array $fields): AbstractQuery
     {
-        if( strpos( strtolower($name), "where" ) !== false ){
-            
-            call_user_func_array(array( $this->getWhere(), $name), $arguments ) ;
-            
-        }
-        
-        if($name == "get" || $name == "fetch" || $name == "count"){
-            
-            array_unshift($arguments, $this) ;
-            
-            return call_user_func_array(array( $this->getRepository(), $name), $arguments ) ;
-            
-        }
-        
-        return $this ;
+        $new = clone $this ;     
+        $new->fields = $fields;      
+        return $new ;        
     }
     
-    public function getRepository()
-    {
-        return $this->repository ;
-    }
-    
-    public function select($fields)
-    {
-        if(is_array($fields)){
-            
-            $this->fields = $fields;
-                
-        }
-        
-        if(is_string($fields)){
-            
-            $this->fields = explode("," , $fields);
-        }
-        
-        return $this ;
-    }
-    
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields ;
     }
-    
-    public function withFields(array $fields)
+     
+    public function start($start): AbstractQuery
     {
-             
-        $this->fields = $fields ;
-        
-        return $this ;
+        $new = clone $this ;       
+        $new->start = $start ;   
+        return $new ;
     }
     
-    
-    
-    public function start($start)
-    {
-        $this->start = $start ;
-        
-        return $this ;
+    public function offset($offset): AbstractQuery
+    {             
+        return $this->start($offset) ;      
     }
     
-    public function offset($offset)
+    public function limit($limit): AbstractQuery
     {
-              
-        return $this->start($offset) ;
-        
-    }
-    
-    public function limit($limit)
-    {
-        $this->limit = $limit ;
-        
-        return $this ;
+        $new = clone $this ;
+        $new->limit = $limit ;        
+        return $new ;
     }
     
     public function getStart()
@@ -120,20 +71,59 @@ abstract class AbstractQuery implements QueryInterface
     {
         return $this->limit ;
     }
-           
-    public function quote( $unsafeString )
+    
+    public function getConditions(): array
     {
-        
-        return $this->getRepository() ->quote( $unsafeString );
-        
+        return $this->conditions ;
     }
     
-    protected function getWhere()
+    public function withConditions(array $conditions): AbstractQuery
     {
-        return $this->whereClause ;
+        $new = clone $this ;
+        $new->conditions = $conditions ;        
+        return $new ;
+    }
+              
+    public function where($field, $value=null, string $operator = null, bool $escape = true, string $logic = null )
+    {
+        if(!is_a($field, AbstractQuery::class) && ( empty($value) || is_null($value) ) ){           
+            throw new QueryException("value can't be empty in where statement " . print_r($this,true) ) ;
+        }       
+        if( is_null($logic) ){       
+            $logic = $this->defaultLogic ;
+        }      
+        $conditions = $this->getConditions() ;       
+        if(count($this->conditions) > 0){        
+            $conditions[] = $logic ;
+        }     
+        if( \is_a($field, AbstractQuery::class) ){
+            
+            $conditions[] = $field->conditions ;
+        }
+        else{
+        
+            $conditions[] = new Condition($field, $value, $escape, $operator) ;       
+        }    
+        return $this->withConditions($conditions) ;             
     }
     
+    public function whereSafe($field, $value = null, $operator = null, $logic = null )
+    {
+        return $this->where($field, $value, $operator, false, $logic) ;
+    }
     
+    public function orWhereSafe($field, $value = null, $operator = null)
+    {
+        return $this->where($field, $value, $operator, false, "OR") ;
+    }
     
-        
+    public function orWhere($field, $value = null, $operator = null)
+    {
+        return $this->where($field, $value, $operator, true,  "OR") ;
+    }
+       
+}
+class QueryException extends \Exception
+{
+    
 }

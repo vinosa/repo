@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2018 vinosa
+ * Copyright (C) 2018
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,39 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Vinosa\Repo;
+namespace Vinosa\Repo ;
 
 /**
- * Description of AbstractConfiguration
+ * Description of SolrQuery
  *
  * @author vinosa
  */
-abstract class AbstractConfiguration
+class SolrQuery extends AbstractQuery
 {
-    protected $config;
+    protected $core = null ;
     
-    public function __construct( $config = [] )
+    public function merge(SolrQuery $query): SolrQuery
     {
-        $this->config = $config;
+        $new = clone $this;
+        $new->conditions = $query->conditions ;       
+        return $new ;
+    }
+      
+    public function whereNot($col, $val)
+    {      
+        return $this->where("!" . $col, $val);                      
     }
     
-    public function get($name, $defaultValue = null)
+    public function withCore($core)
     {
-        if( isset( $this->config[$name] ) ){
-            
-            return $this->config[ $name ] ;
-        }
-        
-        if( !is_null($defaultValue) ){
-            
-            return $defaultValue ;
-        }
-        
-        throw new ConfigurationException("undefined configuration " . $name) ;
+       $new = clone $this ;
+       $new->core = $core;
+       return $new ;
     }
     
-    public function set($name, $value)
-    {
-        $this->config[$name] = $value ;
+    public function hasCore()
+    {                
+        return !is_null($this->core) ;
     }
+    
+    public function getCore()
+    {
+        return $this->core ;
+    }
+       
 }

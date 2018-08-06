@@ -19,9 +19,6 @@
 
 namespace Vinosa\Repo;
 
-use Vinosa\Repo\Reflection\EntityCollectionDefinition ;
-use Vinosa\Repo\Reflection\DocCommentException ;
-
 /**
  * Description of AbstractRepository
  *
@@ -29,35 +26,124 @@ use Vinosa\Repo\Reflection\DocCommentException ;
  */
 abstract class AbstractRepository
 {
-    protected $callbackCreateEntity = "createNewFromIterable";
-    protected $prototype = null ;
+    protected $logger ;
+    protected $reflectionCollection ;
+    protected $entityClassname ;
     
-    public function __construct($entityPrototype = null)
-    {
-        $this->prototype = $entityPrototype ;
+    public function __construct(\Psr\Log\LoggerInterface $logger)
+    {    
+        $this->logger = $logger;  
+        $this->reflectionCollection = new ReflectionCollection ;
     }
     
-    protected function createNew( )
+    public function createNew( $data = [] )
     {
-        if( !is_null($this->prototype) ){
-            
-            $new = clone $this->prototype ;
+        $class = $this->entityFullClassname();                
+        $object = new $class ;                     
+        foreach($data as $key => $value){              
+            foreach($this->entityReflection()->getReflectionProperties() as $property){                 
+                if($property->name == $key){                   
+                    $property->setAccessible(true);
+                    $property->setValue($object, $value) ;
+                }
+            }
+        }       
+        return $object ;     
+    }
+    
+    protected function getEntityPropertyValue($entity, $propertyName)
+    {       
+        foreach($this->entityReflection()->getReflectionProperties() as $property){           
+            if($property->name === $propertyName){                
+                $property->setAccessible(true);
+                return $property->getValue( $entity );              
+            }         
         }
-        else{
-            
-            $new = ( new EntityCollectionDefinition( get_class($this) ) )->createNewEntity() ;
-            
-        }        
-                    
-        $new->setSource( $this ) ;
-       
-        return $new ;
-             
+        return null ;
     }
     
-    protected function createNewFromIterable( $var )
+    protected function setEntityPropertyValue($entity, $propertyName, $value)
     {
-       
-        return $this->createNew( )->withData( $var ) ;
+        foreach($this->entityReflection()->getReflectionProperties() as $property){            
+            if($property->name === $propertyName){                
+                $property->setAccessible(true);
+                $property->setValue($entity, $value);               
+            }           
+        }
     }
+    
+    private function reflectionCollection(): ReflectionCollection
+    {
+        return $this->reflectionCollection ;
+    }
+    
+    protected function entityReflection(): Reflection
+    {
+        return $this->reflectionCollection()->getReflection( $this->entityFullClassname() ) ;
+    }
+      
+    public function entityFullClassname(): string
+    { 
+        if(empty($this->entityClassname)){            
+            $className = $this->reflectionCollection()->getReflection( get_class($this) )->getTagShortDescription("entity");       
+            if(substr($className,0,1) == "\\"){                
+                $this->entityClassname = $className ;
+            }
+            else{       
+                $glue = "\\" ;            
+                $exploded = explode($glue, \get_class($this) ) ;           
+                array_pop( $exploded );          
+                $namespace = implode($glue, $exploded ) ;                                  
+                $this->entityClassname = $namespace . $glue . $className ; 
+            }
+        }
+        return $this->entityClassname ;
+   }
+    
+    
+    public function findBy( array $criteria): array
+    {
+        $query = $this->query();       
+        foreach($criteria as $key => $value){           
+            $query = $query->where($key, $value) ;
+        }        
+        return $this->fetch($query) ;
+    }
+    
+    public function findOneBy( array $criteria)
+    {
+        $query = $this->query();      
+        foreach($criteria as $key => $value){          
+            $query = $query->where($key, $value) ;
+        }        
+        return $this->get($query) ;
+    }
+       
+    protected function conditionsString(array $conditions): string
+    {
+        $str = "";      
+        foreach($conditions as $condition){            
+            if(is_string($condition)){                
+                $str .= " " . $condition ;
+            }            
+            if(is_a($condition, Condition::class)){
+                
+                $str .= " " . $this->conditionToString($condition) ;
+            }           
+            if(is_array($condition)){
+                
+                $str .= " (" . $this->conditionsString($condition) . ")" ;
+            }
+        }       
+        return $str ;
+    }
+    
+}
+class RepositoryException extends \Exception
+{
+    
+}
+class ModelException extends \Exception
+{
+    
 }
