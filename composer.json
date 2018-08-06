@@ -9,7 +9,8 @@
     ],
     "require": {
         "solarium/solarium": "3.6.0",
-        "psr/log": "1.0.0"
+        "psr/log": "1.0.0",
+        "zf1/zend-reflection": "1.12.20"
     },
     "autoload": {
         "psr-4": {
