@@ -140,10 +140,11 @@ abstract class AbstractRepository
     
 }
 class RepositoryException extends \Exception
-{
-    
+{   
 }
 class ModelException extends \Exception
+{   
+}
+class ObjectNotFoundException extends \Exception
 {
-    
 }
