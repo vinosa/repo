@@ -32,7 +32,7 @@ class DatabaseRepository extends AbstractRepository
     public function __construct(\Psr\Log\LoggerInterface $logger, \PDO $pdo)
     {        
         $this->pdo = $pdo ;                                
-        parent::__construct($logger) ;                    
+        $this->logger = $logger ;                      
     } 
           
     public function persist($entity )

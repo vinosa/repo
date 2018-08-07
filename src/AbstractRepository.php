@@ -27,15 +27,9 @@ namespace Vinosa\Repo;
 abstract class AbstractRepository
 {
     protected $logger ;
-    protected $reflectionCollection ;
-    protected $entityClassname ;
-    
-    public function __construct(\Psr\Log\LoggerInterface $logger)
-    {    
-        $this->logger = $logger;  
-        $this->reflectionCollection = new ReflectionCollection ;
-    }
-    
+    private $reflection ;
+    private $entityClassname ;
+      
     public function createNew( $data = [] )
     {
         $class = $this->entityFullClassname();                
@@ -72,20 +66,18 @@ abstract class AbstractRepository
         }
     }
     
-    private function reflectionCollection(): ReflectionCollection
-    {
-        return $this->reflectionCollection ;
-    }
-    
     protected function entityReflection(): Reflection
     {
-        return $this->reflectionCollection()->getReflection( $this->entityFullClassname() ) ;
+        if(empty($this->reflection)){
+            $this->reflection = new Reflection( $this->entityFullClassname() );
+        }
+        return $this->reflection ;
     }
       
     public function entityFullClassname(): string
     { 
         if(empty($this->entityClassname)){            
-            $className = $this->reflectionCollection()->getReflection( get_class($this) )->getTagShortDescription("entity");       
+            $className = ( new Reflection( get_class($this) ) )->getTagShortDescription("entity");       
             if(substr($className,0,1) == "\\"){                
                 $this->entityClassname = $className ;
             }
@@ -101,13 +93,16 @@ abstract class AbstractRepository
    }
     
     
-    public function findBy( array $criteria): array
+    public function findBy( array $criteria,int $offset = 0,int $limit = 0): array
     {
         $query = $this->query();       
         foreach($criteria as $key => $value){           
             $query = $query->where($key, $value) ;
-        }        
-        return $this->fetch($query) ;
+        }     
+        if($limit > 0){
+            $query = $query->start($offset)->limit($limit) ;
+        } 
+        return $this->fetch( $query ) ;
     }
     
     public function findOneBy( array $criteria)
@@ -115,7 +110,7 @@ abstract class AbstractRepository
         $query = $this->query();      
         foreach($criteria as $key => $value){          
             $query = $query->where($key, $value) ;
-        }        
+        } 
         return $this->get($query) ;
     }
        

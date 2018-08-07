@@ -30,7 +30,7 @@ class SolrRepository extends AbstractRepository
     public function __construct(\Psr\Log\LoggerInterface $logger, \Solarium\Client $client)
     {
         $this->client = $client ;
-        parent::__construct( $logger);       
+        $this->logger = $logger ;     
     }
             
     public function select(SolrQuery $query)
