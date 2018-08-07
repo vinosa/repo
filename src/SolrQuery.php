@@ -28,13 +28,6 @@ class SolrQuery extends AbstractQuery
 {
     protected $core = null ;
     
-    public function merge(SolrQuery $query): SolrQuery
-    {
-        $new = clone $this;
-        $new->conditions = $query->conditions ;       
-        return $new ;
-    }
-      
     public function whereNot($col, $val)
     {      
         return $this->where("!" . $col, $val);                      

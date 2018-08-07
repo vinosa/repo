@@ -32,8 +32,36 @@ class SolrRepository extends AbstractRepository
         $this->client = $client ;
         $this->logger = $logger ;     
     }
-            
-    public function select(SolrQuery $query)
+               
+    public function fetch(SolrQuery $query )
+    {
+        try{
+            $result = $this->select( $query->select( $this->fields() )->withCore($this->core() ) );        
+            $entities = [];        
+            foreach($result as $doc){
+                $entities[] = $this->createNew( $doc ) ;
+            }
+            return $entities ;            
+        } catch (\OpenEdition\Pac\Lib\Orm\ObjectNotFoundException $ex) {           
+            $this->logger->warn("fetch empty result: " . $ex->getMessage() );      
+            return [] ;   
+        }       
+    }
+    
+    public function get(SolrQuery $query )
+    {
+        $result =  $this->select( $query->select( $this->fields() )->withCore($this->core() )->limit(1) ) ;            
+        foreach($result as $doc){
+            return $this->createNew( $doc ) ;           
+        }        
+    }
+    
+    public function query(): SolrQuery
+    {
+        return new SolrQuery() ;
+    }
+        
+    protected function select(SolrQuery $query)
     {       
         $select = $this->client->createSelect();        
         $queryString = $this->conditionsString( $query->getConditions() ) ;       
@@ -45,14 +73,10 @@ class SolrRepository extends AbstractRepository
         }       
         try{                               
 			$resultset = $this->client->select( $select );            
-            $this->logger->debug( "query: " . $queryString . 
-                                " , fields: " . implode("," , $query->getFields()) .
-                                " , limit " . $query->getLimit() . 
-                                ", " . count($resultset) . 
-                                " rows, total: " . $resultset->getNumFound()  
-                                ) ;           
+            $this->logger->debug( "query: " . $queryString . " , fields: " . implode("," , $query->getFields()) .
+                                " , limit " . $query->getLimit() . ", " . count($resultset) . " rows, total: " . $resultset->getNumFound() ) ;           
             if( count($resultset) == 0 ){               
-                throw new \OpenEdition\Pac\Lib\Orm\ObjectNotFoundException("solarium resultset is empty") ;
+                throw new \OpenEdition\Pac\Lib\Orm\ObjectNotFoundException( $queryString ) ;
             }        
             return $resultset ;
         }
@@ -62,40 +86,14 @@ class SolrRepository extends AbstractRepository
 		}
     }
     
-    public function fetch(SolrQuery $query )
+    protected function fields()
     {
-        try{
-            $result = $this->select( $this->query( $this->createNew() )->merge($query) );        
-            $entities = [];        
-            foreach($result as $doc){
-                $entities[] = $this->createNew( $doc ) ;
-            }
-            return $entities ;            
-        } catch (\OpenEdition\Pac\Lib\Orm\ObjectNotFoundException $ex) {           
-            $this->logger->warn("fetch returned empty result: " . $ex->getMessage() );      
-             return [] ;   
-        }       
+        return \array_map(function(\OE\Core\Repository\EntityProperty $property) { return $property->name(); }, $this->entityReflection()->getEntityProperties() ) ;
     }
     
-    public function get(SolrQuery $query )
+    protected function core()
     {
-        $result =  $this->select( $this->query( $this->createNew() )->limit(1)->merge($query) ) ;            
-        foreach($result as $doc){
-            return $this->createNew( $doc ) ;           
-        }        
-    }
-    
-    
-    public function query($entity = null ) : SolrQuery
-    {
-        $query = new SolrQuery() ;       
-        if(is_null($entity)){            
-            return $query ;            
-        }                     
-        return $query->select( \array_map(function( EntityProperty $property)
-                                          { return $property->name(); },
-                              $this->entityReflection()->getEntityProperties() ) ) 
-                            ->withCore( $this->entityReflection()->getTagShortDescription("core"));
+        return $this->entityReflection()->getTagShortDescription("core") ;
     }
     
     protected function getResult()
