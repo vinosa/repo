@@ -26,28 +26,5 @@ namespace Vinosa\Repo ;
  */
 class SolrQuery extends AbstractQuery
 {
-    protected $core = null ;
-    
-    public function whereNot($col, $val)
-    {      
-        return $this->where("!" . $col, $val);                      
-    }
-    
-    public function withCore($core)
-    {
-       $new = clone $this ;
-       $new->core = $core;
-       return $new ;
-    }
-    
-    public function hasCore()
-    {                
-        return !is_null($this->core) ;
-    }
-    
-    public function getCore()
-    {
-        return $this->core ;
-    }
-       
+    protected $defaultOperator = ":" ;
 }

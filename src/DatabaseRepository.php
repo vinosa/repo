@@ -52,34 +52,36 @@ class DatabaseRepository extends AbstractRepository
     }
        
     public function get(SqlQuery $query)
-    {                                    
-        try{       
-            $statement = $this->selectStatement($query->limit(1));                                  
-            $statement->execute();                      
-            $row = $statement->fetch() ;           
-            $this->logger->debug( $statement->queryString . " (". $statement->rowCount() . " rows)" );                      
-            if(!is_array($row) || count($row) == 0 ){               
-                throw new ObjectNotFoundException( "EMPTY RESULT: " . $statement->queryString );               
-            }                      
-            return $this->createNew($row) ;
-        } 
-        catch (\PDOException $ex) {                        
-            throw new RepositoryException( $ex->getMessage()  );
-        }               
+    {                                           
+        $statement = $this->selectStatement($query->limit(1));                                   
+        $statement->execute();                       
+        $row = $statement->fetch() ;            
+        $this->logger->debug( $statement->queryString . " (". $statement->rowCount() . " rows)" );                      
+        if($statement->rowCount() === 0){ 
+            return null ;                
+        }  
+        return $this->createNew($row) ;                    
+    }
+    
+    public function getOrFail(SqlQuery $query)
+    {
+        $statement = $this->selectStatement($query->limit(1));                                   
+        $statement->execute();                       
+        $row = $statement->fetch() ;            
+        $this->logger->debug( $statement->queryString . " (". $statement->rowCount() . " rows)" );                      
+        if($statement->rowCount() === 0){                 
+            throw new \OE\Core\Exceptions\ObjectNotFoundException( "EMPTY RESULT: " . $statement->queryString );                
+        }                      
+        return $this->createNew($row) ;
     }
     
     public function fetch(SqlQuery $query )
-    {                                      
-        try{          
-            $statement = $this->selectStatement( $query );                                 
-            $statement->execute();                     
-            $rows = $statement->fetchAll() ;          
-            $this->logger->debug( $statement->queryString . " (". $statement->rowCount() . " rows)" );           
-            return \array_map( [$this,"createNew"], $rows );           
-        } 
-        catch (\PDOException $ex) {                     
-            throw new RepositoryException(  $ex->getMessage()  );          
-        }               
+    {         
+        $statement = $this->selectStatement( $query );                                 
+        $statement->execute();                       
+        $rows = $statement->fetchAll() ;  
+        $this->logger->debug( $statement->queryString . " (". $statement->rowCount() . " rows)" );    
+        return \array_map( [$this,"createNew"], $rows );                         
     }
            
     public function count(SqlQuery $query)

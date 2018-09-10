@@ -33,9 +33,9 @@ abstract class AbstractRepository
     public function createNew( $data = [] )
     {
         $class = $this->entityFullClassname();                
-        $object = new $class ;                     
-        foreach($data as $key => $value){              
-            foreach($this->entityReflection()->getReflectionProperties() as $property){                 
+        $object = new $class ;
+        foreach($data as $key => $value){
+            foreach((new \ReflectionClass($class))->getProperties() as $property){ 
                 if($property->name == $key){                   
                     $property->setAccessible(true);
                     $property->setValue($object, $value) ;
@@ -95,23 +95,25 @@ abstract class AbstractRepository
     
     public function findBy( array $criteria,int $offset = 0,int $limit = 0): array
     {
-        $query = $this->query();       
-        foreach($criteria as $key => $value){           
-            $query = $query->where($key, $value) ;
-        }     
+        $query = $this->query()->withCriteria($criteria) ;
         if($limit > 0){
             $query = $query->start($offset)->limit($limit) ;
-        } 
+        }
         return $this->fetch( $query ) ;
     }
     
     public function findOneBy( array $criteria)
-    {
-        $query = $this->query();      
-        foreach($criteria as $key => $value){          
-            $query = $query->where($key, $value) ;
-        } 
-        return $this->get($query) ;
+    {  
+        return $this->get($this->query()->withCriteria($criteria)) ;
+    }
+    /**
+     * same as findOne() but throws exception if not found
+     * @param array $criteria
+     * @return type
+     */
+    public function requireOneBy(array $criteria)
+    {    
+        return $this->getOrFail($this->query()->withCriteria($criteria)) ;
     }
        
     protected function conditionsString(array $conditions): string
@@ -135,9 +137,6 @@ abstract class AbstractRepository
     
 }
 class RepositoryException extends \Exception
-{   
-}
-class ModelException extends \Exception
 {   
 }
 class ObjectNotFoundException extends \Exception

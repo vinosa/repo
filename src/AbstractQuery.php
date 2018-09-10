@@ -26,7 +26,7 @@ namespace Vinosa\Repo ;
 class AbstractQuery
 {      
     protected $start = 0;
-    protected $limit = 10;
+    protected $limit ;
     protected $fields = [] ;
     protected $conditions = [] ;
     protected $defaultLogic = "AND" ;
@@ -82,46 +82,76 @@ class AbstractQuery
         $new = clone $this ;
         $new->conditions = $conditions ;        
         return $new ;
-    }
-              
-    public function where($field, $value=null, string $operator = null, bool $escape = true, string $logic = null )
-    {
-        if(!is_a($field, AbstractQuery::class) && ( empty($value) || is_null($value) ) ){           
-            throw new QueryException("value can't be empty in where statement " . print_r($this,true) ) ;
-        }       
-        if( is_null($logic) ){       
-            $logic = $this->defaultLogic ;
-        }      
-        $conditions = $this->getConditions() ;       
-        if(count($this->conditions) > 0){        
-            $conditions[] = $logic ;
-        }     
-        if( \is_a($field, AbstractQuery::class) ){
-            
-            $conditions[] = $field->conditions ;
-        }
-        else{
+    }           
         
-            $conditions[] = new Condition($field, $value, $escape, $operator) ;       
-        }    
-        return $this->withConditions($conditions) ;             
+    public function withCriteria(array $criteria): AbstractQuery
+    {
+        return $this->withConditions( $this->criteriaToConditions($criteria) );
     }
     
-    public function whereSafe($field, $value = null, $operator = null, $logic = null )
+    protected function criteriaToConditions(array $criteria): array
     {
-        return $this->where($field, $value, $operator, false, $logic) ;
+        $conditions = [] ;
+        foreach($criteria as $key => $value){
+            $conditions = $this->criteriaAutomate($conditions, $key, $value);
+        }
+        return $conditions ;
+    }
+        
+    protected function criteriaAutomate($conditions,$key,$value) : array
+    {
+        $logic = $this->defaultLogic;        
+        if( (empty($key) || !is_string($key))  && $this->isLogic($value) ){
+            $logic = strtoupper($value) ;
+        }
+        if($this->needsLogic($conditions)){
+            $conditions[] = $logic ;
+        }
+        if(is_string($key)){            
+            $conditions[] = new Condition($key, $value, true, $this->defaultOperator);
+        }
+        if( (empty($key) || !is_string($key)) && is_array($value) ){
+            $conditions[] = $this->arrayToCondition($value);
+        }
+        return $conditions ;    
     }
     
-    public function orWhereSafe($field, $value = null, $operator = null)
+    protected function arrayToCondition($arr)
     {
-        return $this->where($field, $value, $operator, false, "OR") ;
+        if(is_string($arr[0])){
+            if(count($arr)<3){
+                throw new QueryException("invalid query item: " . print_r($arr,true) . " should be [field,operator,value] ");
+            }
+            $escape = true;
+            if(isset($arr[3])){
+                $escape = $arr[3] ;
+            }
+            return new Condition($arr[0], $arr[2], $escape, $arr[1]) ; 
+        }
+        $res = [];
+        foreach($arr as $key => $value){
+            $res = $this->criteriaAutomate($res,$key, $value);
+        }
+        return $res ;
     }
     
-    public function orWhere($field, $value = null, $operator = null)
+    protected function isLogic($value): bool
     {
-        return $this->where($field, $value, $operator, true,  "OR") ;
+        if(is_string($value) && (strtolower($value) == "or" || strtolower($value) == "and")){
+            return true ;
+        }
+        return false ;
     }
-       
+    
+    protected function needsLogic($conditions)
+    {
+        $count = count($conditions) ;
+        if($count>0 && !$this->isLogic($conditions[$count-1])){
+            return true;
+        }
+        return false;
+    }
+    
 }
 class QueryException extends \Exception
 {
