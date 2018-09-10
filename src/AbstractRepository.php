@@ -30,18 +30,23 @@ abstract class AbstractRepository
     private $reflection ;
     private $entityClassname ;
       
+    /**
+     * creates new entity from an iterable
+     * @param type $data
+     * @return
+     */   
     public function createNew( $data = [] )
     {
-        $class = $this->entityFullClassname();                
+        $class = $this->entityFullClassname();         
         $object = new $class ;
-        foreach($data as $key => $value){
-            foreach((new \ReflectionClass($class))->getProperties() as $property){ 
-                if($property->name == $key){                   
-                    $property->setAccessible(true);
-                    $property->setValue($object, $value) ;
-                }
+        $mapping = $this->reflection()->getFieldsMapping($class);
+        foreach($data as $key => $value){  
+            if(isset($mapping[$key])){
+                $property = $mapping[$key];
+                $property->setAccessible(true);
+                $property->setValue($object, $value) ;
             }
-        }       
+        } 
         return $object ;     
     }
     
@@ -71,20 +76,6 @@ abstract class AbstractRepository
             $this->entityClassname = $className ;
         }
         return $this->entityClassname ;
-       /* if(empty($this->entityClassname)){            
-            $className = ( new Reflection( get_class($this) ) )->getTagShortDescription("entity");       
-            if(substr($className,0,1) == "\\"){                
-                $this->entityClassname = $className ;
-            }
-            else{       
-                $glue = "\\" ;            
-                $exploded = explode($glue, \get_class($this) ) ;           
-                array_pop( $exploded );          
-                $namespace = implode($glue, $exploded ) ;                                  
-                $this->entityClassname = $namespace . $glue . $className ; 
-            }
-        }
-        return $this->entityClassname ;*/
    }
     
     
