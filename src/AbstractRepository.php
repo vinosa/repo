@@ -45,38 +45,33 @@ abstract class AbstractRepository
         return $object ;     
     }
     
-    protected function getEntityPropertyValue($entity, $propertyName)
-    {       
-        foreach($this->entityReflection()->getReflectionProperties() as $property){           
-            if($property->name === $propertyName){                
-                $property->setAccessible(true);
-                return $property->getValue( $entity );              
-            }         
-        }
-        return null ;
-    }
-    
-    protected function setEntityPropertyValue($entity, $propertyName, $value)
+    public function withEntityType(string $entityClass): AbstractRepository
     {
-        foreach($this->entityReflection()->getReflectionProperties() as $property){            
-            if($property->name === $propertyName){                
-                $property->setAccessible(true);
-                $property->setValue($entity, $value);               
-            }           
-        }
+        $new = clone $this;
+        $new->entityClassname = $entityClass;
+        return $new ;
     }
     
-    protected function entityReflection(): Reflection
+   
+    protected function reflection(): Reflection
     {
         if(empty($this->reflection)){
-            $this->reflection = new Reflection( $this->entityFullClassname() );
+            $this->reflection = new Reflection();
         }
         return $this->reflection ;
     }
       
     public function entityFullClassname(): string
     { 
-        if(empty($this->entityClassname)){            
+        if(empty($this->entityClassname)){
+            $className =  $this->reflection()->getClassComment( \get_class($this) )->getTag("entity")->getShortDescription() ;
+            if(strpos($className,"\\") === false){
+                $className = $this->reflection->getReflectionClass(\get_class($this))->getNamespaceName() . "\\" . $className ;
+            }
+            $this->entityClassname = $className ;
+        }
+        return $this->entityClassname ;
+       /* if(empty($this->entityClassname)){            
             $className = ( new Reflection( get_class($this) ) )->getTagShortDescription("entity");       
             if(substr($className,0,1) == "\\"){                
                 $this->entityClassname = $className ;
@@ -89,7 +84,7 @@ abstract class AbstractRepository
                 $this->entityClassname = $namespace . $glue . $className ; 
             }
         }
-        return $this->entityClassname ;
+        return $this->entityClassname ;*/
    }
     
     

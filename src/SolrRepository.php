@@ -90,17 +90,12 @@ class SolrRepository extends AbstractRepository
     
     protected function fields()
     {
-        return \array_map(function(EntityProperty $property) { return $property->name(); }, $this->entityReflection()->getEntityProperties() ) ;
+        return array_keys($this->reflection()->getFieldsMapping( $this->entityFullClassname() ) );
     }
     
     protected function core()
     {
-        return $this->entityReflection()->getTagShortDescription("core") ;
-    }
-    
-    protected function getResult()
-    {
-        return $this->lastResult ;
+        return $this->reflection()->getClassComment( $this->entityFullClassname() )->getTag("ORM\Core")->getShortDescription() ;
     }
     
     protected function conditionToString(Condition $condition): string

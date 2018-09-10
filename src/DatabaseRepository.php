@@ -98,59 +98,42 @@ class DatabaseRepository extends AbstractRepository
     }
        
     public function query($entity = null): SqlQuery
-    {     
-        $query = (new SqlQuery() )->from($this->table() )->select( $this->fields() ) ;       
-        if(is_null($entity)){          
-            return $query ;           
-        }                                                   
-        foreach($this->entityReflection()->getEntityProperties() as  $property ){            
-            $key = $property->name() ;           
-            $value = $this->getEntityPropertyValue($entity, $key );                    
-            if($this->isFieldUnique($key) && !empty($value) ){                
-                $query = $query->where($key, $value)  ;
-            }         
-            if( $property->readOnly() || empty($value) ){                
-                continue ;
-            }                                                                     
-            $query = $query->insert($key, $value) ;                                      
-            if( !$this->isFieldUnique($key)){                              
-                $query = $query->update($key, $value);
-            }           
-        }                               
-        return $query ;
+    {  
+        return (new SqlQuery() )->from( $this->table() )->select( $this->fields() ) ; 
     }
        
     protected function persistStatement($entity): \PDOStatement
     {
-        $query = $this->query( $entity );        
-        $toBound = [];       
-        foreach($query->getInsert() as $field => $value){                       
-            if($this->isFieldUnescaped($entity, $field)){                
-                $t[] = $value ;
+        $bound = [];$insert = [];$values = [];$update = [];  
+        foreach($this->reflection()->getFieldsMapping( \get_class($entity) ) as $columnName => $property){
+            $docComment = $this->reflection()->getReflectionPropertyComment( $property ) ;
+            $tag = $docComment->getTag("ORM\Column");
+            $type = $tag->getOption("type");
+            $property->setAccessible(true);
+            $value = $property->getValue( $entity );
+            if(empty($value)){
+                continue ;
             }
-            else{               
-                $t[] = ":" . $field ;
-                $toBound[] = $field ;
+            if($type == "datetime"){
+                $values[] = $value;
             }
-        }            
-        $t2 = [];              
-        foreach($query->getUpdate() as $field => $value){            
-            if($this->isFieldUnescaped($entity, $field)){                
-                $t2[] = "{$field} = {$value}" ;
+            else{
+                $values[] = ":" . $columnName;
+                $bound[$columnName] = $value ;
             }
-            else{               
-                $t2[] = "{$field} = :" . $field;
-            }
-        }                      
-        $q = "INSERT INTO " . $query->getFrom() . " (" . implode(", " , array_keys( $query->getInsert()) ) . ") VALUES (" . implode(",",$t) . ")" 
-            
-            . " ON DUPLICATE KEY UPDATE " . implode(",",$t2); 
-                 
-        $statement = $this->pdo->prepare( $q );       
-        foreach($toBound as $field){           
-            $statement->bindParam($field, $query->getInsert()[$field]);
-        }       
-        return $statement;
+            $insert[] = $columnName;
+            if( !$docComment->hasTag("ORM\Id")  && (bool)$tag->getOption("unique") == false ){
+                $update[] = $columnName . "=" . end($values) ;
+            }                
+        }
+        $q = "INSERT INTO " . $this->table() . " (" . \implode(", " , $insert ) . ") VALUES (" . \implode(",", $values )  . ")"            
+            . " ON DUPLICATE KEY UPDATE " . \implode( ",", $update ); 
+
+        $statement = $this->db->pdo()->prepare( $q );        
+        foreach($bound as $key => $value){      
+            $statement->bindValue($key, $value);
+        }      
+        return $statement;        
     }
        
     public function column($column): string
@@ -160,13 +143,16 @@ class DatabaseRepository extends AbstractRepository
     
     public function table(): string
     {
-        return $this->entityReflection()->getTagShortDescription("table") ;
+        return $this->reflection()->getClassComment( $this->entityFullClassname() )->getTag("ORM\Table")->requireOption("name") ;
     }
     
     public function fields(): array
     {
-        $table = $this->table() ;        
-        return \array_map(function($property) use($table) {return $table . "." . $property->name();}, $this->entityReflection()->getEntityProperties() ) ; 
+        $fields = [];
+        foreach($this->reflection()->getFieldsMapping( $this->entityFullClassname() ) as $field => $property){
+            $fields[] = $this->table() .  "." . $field ;       
+        }
+        return $fields ;
     }
         
     public function countStatement(SqlQuery $query) : \PDOStatement
@@ -249,31 +235,20 @@ class DatabaseRepository extends AbstractRepository
         }       
     }
     
-    protected function isFieldUnescaped($entity,$field)
-    {  
-        if( in_array($field, $this->entityReflection()->getTagPropertyNames("unescaped") ) ){           
-            return true;
-        }      
-        return false ;
-    }
-    
     protected function setLastInsertId($entity)
     {
-        $primary = $this->entityReflection()->getTagPropertyNames("primary");       
-        if(count($primary)>0){            
-            $field = $primary[0] ;           
-            $id = $this->pdo->lastInsertId() ;           
-            $this->logger->debug("last insert id for " . $this->table() . "." . $field . " is " . $id);
-            $value = $this->getEntityPropertyValue($entity, $field);           
-            if(empty($value)){                
-                $this->setEntityPropertyValue($entity, $field, $id ) ;
+        foreach($this->reflection()->getFieldsMapping(\get_class($entity)) as $property){
+            $docComment = $this->reflection()->getReflectionPropertyComment( $property ) ;
+            if($docComment->hasTag("ORM\Id")){
+                $property->setAccessible(true); 
+                if(empty($property->getValue($entity))){
+                    $id = $this->db->pdo()->lastInsertId() ;                    
+                    $property->setValue($entity, $id);
+                    $this->logger->debug("last insert id for " . $this->column($docComment->getTag("ORM\Column")->requireOption("name")) . " is " . $id );
+                }
+                return ;
             }
         }
     }
-    
-    protected function isFieldUnique($field): bool
-    {      
-        return in_array( $field, array_merge($this->entityReflection()->getTagPropertyNames("unique"), $this->entityReflection()->getTagPropertyNames("primary") ) );
-    } 
     
 }

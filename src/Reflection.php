@@ -15,79 +15,81 @@ namespace Vinosa\Repo ;
  */
 class Reflection
 {
-    protected $docComment;
-    protected $lines ;
-    protected $className ;
-    protected $entityProperties = null ;
-    protected $reflectionClass ;
-    protected $reflectionProperties ;
-    
-    public function __construct(string $className)
+   protected $classComments = [];
+    protected $propertiesComments = [];
+    protected $reflectionProperties = [];
+    protected $reflectionClasses = [];
+    protected $fieldsMapping = [];
+    protected $joinProperties = [];
+        
+    public function getClassComment(string $class): DocComment
     {
-        $this->reflectionClass = new \ReflectionClass($className) ;       
-        $this->docComment = $this->reflectionClass->getDocComment();       
-        $this->reflectionProperties = $this->reflectionClass->getProperties();            
-        $this->className = $className ;
+        if(!isset($this->classComments[$class])){
+            $this->classComments[$class] = new DocComment( $this->getReflectionClass($class)->getDocComment() );
+        }
+        return $this->classComments[$class];
     }
     
-    public function getReflectionProperties()
+    public function getReflectionPropertyComment(\ReflectionProperty $property): DocComment
     {
-        return $this->reflectionProperties ;
+        return $this->getPropertyComment($property->getDeclaringClass()->getName(), $property->getName());
     }
-  
-    public function getEntityProperties()
+    
+    protected function getPropertyComment(string $class,string $propertyName): DocComment
     {
-        try{
-            $block = ( new \Zend_Reflection_Class( $this->className) )->getDocblock();           
-            $properties = [] ;           
-            foreach(\array_map( [$this, "getTagPropertyName"] , $block->getTags("property") ) as $name){           
-                $properties[] = new EntityProperty( $name ) ;
-            }            
-            foreach(\array_map( [$this, "getTagPropertyName"] , $block->getTags("property-read") ) as $name){       
-                $properties[] = new EntityProperty( $name, true ) ;
-            } 
-            return $properties ;           
-        } catch (\Zend_Reflection_Exception $ex) {           
-            return [] ;           
-        }             
+        if(!isset($this->propertiesComments[$class][$propertyName])){           
+            $this->propertiesComments[$class][$propertyName] = new DocComment( $this->getReflectionClass($class)->getProperty($propertyName)->getDocComment() );
+        }
+        return $this->propertiesComments[$class][$propertyName] ;
     }
     
-    protected function getBlockPropertyTags(\Zend_Reflection_Docblock $block)
-    {      
-        return $block->getTags("property")  ;
+    public function getReflectionProperties(string $class): array
+    {        
+        if(!isset($this->reflectionProperties[$class])){
+            $this->reflectionProperties[$class] = (new \ReflectionClass($class) )->getProperties() ;
+        }
+        return $this->reflectionProperties[$class] ;
     }
     
-    protected function getTagPropertyName(\Zend_Reflection_Docblock_Tag $tag)
-    {       
-        $exploded = explode(" ", $tag->getDescription() );              
-        foreach($exploded as $val){           
-            if(strpos($val,"$") === 0){               
-                return \substr($val,1);
+    public function getReflectionClass(string $class): \ReflectionClass
+    {
+        if(!isset($this->reflectionClasses[$class])){
+            $this->reflectionClasses[$class] = new \ReflectionClass($class);
+        }
+        return $this->reflectionClasses[$class] ;
+    }
+    
+    public function getFieldsMapping(string $class): array
+    {
+        if(!isset($this->fieldsMapping[$class])){
+            $this->fieldsMapping[$class] = [];
+            foreach($this->getReflectionProperties($class) as $property){
+                $docComment = $this->getReflectionPropertyComment($property) ;
+                if($docComment->hasTag("ORM\Field")){
+                    $this->fieldsMapping[$class][$docComment->getTag("ORM\Field")->requireOption("name")] = $property ;
+                }
+                if($docComment->hasTag("ORM\Column")){
+                    $this->fieldsMapping[$class][$docComment->getTag("ORM\Column")->requireOption("name")] = $property ;
+                }
             }
-        }       
-        throw new ModelException("no property name declared") ;
+        }
+        return $this->fieldsMapping[$class] ;
     }
     
-    protected function getTagByPropertyName(\Zend_Reflection_Docblock $block, $propertyName)
-    {
-        foreach($this->getBlockPropertyTags($block) as $tag){          
-            if($this->getTagPropertyName($tag) == $propertyName){              
-                return $tag ;
+    public function getJoinProperties(string $class): array
+    {        
+        if(!isset($this->joinProperties[$class])){
+            $this->joinProperties[$class] = [];
+            foreach($this->getReflectionProperties($class) as $property){
+                $docComment = $this->getReflectionPropertyComment($property);
+                if($docComment->hasTag("ORM\OneToOne")){
+                    $this->joinProperties[$class][] = $property ;
+                }
             }
-        }    
-        return new \Zend_Reflection_Docblock_Tag("");      
-    }    
-    
-    public function getTagShortDescription(string $tag): string
-    {       
-        foreach( ( new \Zend_Reflection_Class( $this->className) )->getDocblock()->getTags($tag) as $tag){            
-            return $tag->getDescription();
-        }       
-        throw new ReflectionException("no tag " . $tag .  " in doc comment of class " . $this->className ) ;
+        }
+        return $this->joinProperties[$class] ;
     }
-    
 }
-class ReflectionException extends \Exception
-{
-    
+class RepositoryReflectionException extends \Exception
+{    
 }

@@ -30,6 +30,7 @@ class SqlQuery extends AbstractQuery
     protected $update = [];
     protected $join = "" ;
     protected $from ;
+    protected $defaultOperator = "=" ;
       
     public function insert($column, $value): SqlQuery
     {
