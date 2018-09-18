@@ -107,8 +107,12 @@ class SolrRepository extends AbstractRepository
         }
         else{              
              $safeString = $helper->escapePhrase( $condition->value );             
-        }          
-        return $condition->field . ":" . $safeString ;             
+        } 
+        $s = $condition->field . ":" . $safeString ;
+        if( trim(strtolower($condition->operator)) === "not" || trim($condition->operator) === "!="){
+            $s = "!" . $s ;
+        }
+        return $s ;              
     }
     
 }
